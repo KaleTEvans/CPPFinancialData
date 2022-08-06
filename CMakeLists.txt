@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.14)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(namespace "Financial")
 # set the project name
 project("FinancialData"
         DESCRIPTION "CPP API wrapper for multiple financial data APIs"
@@ -14,22 +13,16 @@ message(STATUS "This project has a top-level one called [${CMAKE_PROJECT_NAME}]"
 else()
 message(STATUS "This project is a top-level one")
 endif()
-
 add_library(${PROJECT_NAME} STATIC)
 
 find_package(cpprestsdk REQUIRED)
 
 target_sources(${PROJECT_NAME}
     PRIVATE
-        src/FinnhubSocket.cpp
         src/FinnhubConnections.cpp
+        src/FinnhubSocket.cpp
         src/AlphaVantage.cpp
-        src/TimeConversions.cpp
 )
-
-# add the executable
-# add_executable(${PROJECT_NAME}) 
-
 
 target_link_libraries(${PROJECT_NAME} 
     cpprestsdk::cpprest
@@ -46,78 +39,15 @@ target_include_directories(${PROJECT_NAME}
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-# installation
-if(DEFINED CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    message(
-        STATUS
-        "CMAKE_INSTALL_PREFIX is not set\n"
-        "Default value: ${CMAKE_INSTALL_PREFIX}\n"
-        "Will set it to ${CMAKE_SOURCE_DIR}/install"
-    )
-    set(CMAKE_INSTALL_PREFIX
-        "${CMAKE_SOURCE_DIR}/install"
-        CACHE PATH "Where the library will be installed to" FORCE
-    )
-else()
-    message(
-        STATUS
-        "CMAKE_INSTALL_PREFIX was already set\n"
-        "Current value: ${CMAKE_INSTALL_PREFIX}"
-    )
-endif()
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+install(FILES "${PROJECT_BINARY_DIR}/FinancialDataConfig.h" DESTINATION include)
 
-set(public_headers
-    include/FinancialData.h
-)
+# test logic
+option(TEST_FINNHUB "Test library for finnhub endpoints" ON)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${public_headers}")
+configure_file(FinancialDataConfig.h.in FinancialDataConfig.h)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
+include(CTest)
 
-# if you haven't included it already
-# definitions of CMAKE_INSTALL_LIBDIR, CMAKE_INSTALL_INCLUDEDIR and others
-include(GNUInstallDirs)
+add_subdirectory(tests)
 
-# install the target and create export-set
-install(TARGETS ${PROJECT_NAME}
-    EXPORT "${PROJECT_NAME}Targets"
-    # these get default values from GNUInstallDirs, no need to set them
-    #RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # bin
-    #LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} # lib
-    #ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} # lib
-    # except for public headers, as we want them to be inside a library folder
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME} # include/SomeLibrary
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # include
-)
-
-# generate and install export file
-install(EXPORT "${PROJECT_NAME}Targets"
-    FILE "${PROJECT_NAME}Targets.cmake"
-    NAMESPACE ${namespace}::
-    DESTINATION cmake
-)
-
-include(CMakePackageConfigHelpers)
-
-# generate the version file for the config file
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    VERSION "${version}"
-    COMPATIBILITY AnyNewerVersion
-)
-# create config file
-configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    INSTALL_DESTINATION cmake
-)
-# install config files
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    DESTINATION cmake
-)
-# generate the export targets for the build tree
-export(EXPORT "${PROJECT_NAME}Targets"
-    FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Targets.cmake"
-    NAMESPACE ${namespace}::
-)

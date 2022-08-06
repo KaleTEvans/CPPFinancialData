@@ -52,7 +52,7 @@ endif()
 add_library(Financial::FinancialData STATIC IMPORTED)
 
 set_target_properties(Financial::FinancialData PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
+  INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include;${_IMPORT_PREFIX}/include"
   INTERFACE_LINK_LIBRARIES "cpprestsdk::cpprest"
 )
 

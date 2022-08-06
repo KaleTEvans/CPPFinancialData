@@ -1,6 +1,7 @@
-#include "FinnhubConnections.h"
+#include "FinancialData/FinnhubConnections.h"
 #include "Keys.h"
 #include "TimeConversions.h"
+#include "Logger.h"
 
 const string base = "https://finnhub.io/api/v1/";
 string end = "&token=" + finnHubKey;
@@ -43,6 +44,11 @@ namespace PriceData
         string params = "quote?symbol=" + ticker;
         json::value retVal = getJson(base, params, end);
 
+        if (retVal.is_null()) {
+            CPPFINANCIALDATA_ERROR("No quote data received for ticker input: {}", ticker);
+            throw std::runtime_error("Try another symbol");
+        }
+
         unordered_map<string, double> res;
 
         // Values
@@ -61,6 +67,11 @@ namespace PriceData
         json::value retVal = getJson(base, params, end);
 
         unordered_map<string, double> res;
+
+        if (retVal.is_null()) {
+            CPPFINANCIALDATA_ERROR("No bid/ask data received for ticker input: {}", ticker);
+            throw std::runtime_error("Try another symbol");
+        }
 
         // Values
         res.insert({"ask", retVal[U("a")].as_double()});
@@ -84,6 +95,11 @@ namespace Fundamentals
         json::value buzz = retVal[U("buzz")];
         json::value sentiment = retVal[U("sentiment")];
 
+        if (buzz.is_null()) {
+            CPPFINANCIALDATA_ERROR("No news sent data received for ticker input: {}", ticker);
+            throw std::runtime_error("Try another symbol");
+        }
+
         res.insert({"articlesinlastweek", buzz[U("articlesInLastWeek")].as_double()});
         res.insert({"buzz", buzz[U("buzz")].as_double()});
         res.insert({"weeklyaverage", buzz[U("weeklyAverage")].as_double()});
@@ -106,6 +122,12 @@ namespace Fundamentals
         }
 
         json::value retVal = getJson(base, params, end);
+
+        if (retVal[U("metric")].is_null()) {
+            CPPFINANCIALDATA_ERROR("No financial data received for ticker input: {}", ticker);
+            throw std::runtime_error("Try another symbol");
+        }
+
         return retVal;
     }
 
@@ -119,6 +141,12 @@ namespace Fundamentals
         json::value retVal = getJson(base, params, end);
 
         auto earningsArr = retVal[U("earningsCalendar")].as_array();
+
+        if (earningsArr.size() < 1) {
+            CPPFINANCIALDATA_ERROR("No earnings data received for ticker input: {}", ticker);
+            throw std::runtime_error("Try another symbol");
+        }
+
         json::value earnings = earningsArr[earningsArr.size()-1];
 
         unordered_map<string, double> res;
@@ -147,7 +175,11 @@ namespace Fundamentals
         json::value retVal = getJson(base, params, end);
 
         auto twitArr = retVal[U("twitter")].as_array();
-        if (twitArr.size() < 1) throw std::runtime_error("Error: No data available for this ticker");
+        
+        if (twitArr.size() < 1) {
+            CPPFINANCIALDATA_ERROR("No twitter data received for ticker input: {}", ticker);
+            throw std::runtime_error("Try another symbol");
+        }
 
         auto current = twitArr[0].as_object();
 
@@ -165,7 +197,11 @@ namespace Fundamentals
         vector<SupplyChainRelations*> res;
 
         auto supplyChainArr = retVal[U("data")].as_array();
-        if (supplyChainArr.size() < 1) throw std::runtime_error("Error: No data available for this ticker");
+        
+        if (supplyChainArr.size() < 1) {
+            CPPFINANCIALDATA_ERROR("No supply chain data received for ticker input: {}", ticker);
+            throw std::runtime_error("Try another symbol");
+        }
 
         for (auto it = supplyChainArr.begin(); it != supplyChainArr.end(); ++it) {
             auto data = *it;

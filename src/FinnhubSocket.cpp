@@ -1,5 +1,6 @@
-#include "FinnhubSocket.h"
+#include "FinancialData/FinnhubSocket.h"
 #include "Keys.h"
+#include "Logger.h"
 
 PriceData::FSocket::FSocket(std::vector<std::string>& tickers) {
         // Add ticker values to array
@@ -73,7 +74,13 @@ void PriceData::FSocket::closeSocket() {
         std::cout << "Connection closed" << std::endl;
     });
 
-    client.close().wait();
+    try {
+        client.close().wait();
+    }
+    catch (std::error_code& code) {
+        CPPFINANCIALDATA_ERROR("Issue closing FSocket");
+        std::cout << "ERROR: " << code << std::endl;
+    }
 }
 
 json::value PriceData::FSocket::fromString(std::string const &input) {

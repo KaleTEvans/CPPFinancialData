@@ -1,0 +1,2 @@
+#define FinancialData_VERSION_MAJOR @FinancialData_VERSION_MAJOR@
+#define FinancialData_VERSION_MINOR @FinancialData_VERSION_MINOR@

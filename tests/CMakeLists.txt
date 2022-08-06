@@ -1,3 +1,5 @@
 enable_testing()
 
-add_subdirectory(data)
+if (TEST_FINNHUB)
+    add_subdirectory(finnhub)
+endif()
