@@ -1,7 +1,7 @@
 #include "FinancialData/FinnhubConnections.h"
 #include "Keys.h"
 #include "TimeConversions.h"
-#include "Logger.h"
+#include "FinancialData/Logger.h"
 
 const string base = "https://finnhub.io/api/v1/";
 string end = "&token=" + finnHubKey;
@@ -44,7 +44,7 @@ namespace PriceData
         string params = "quote?symbol=" + ticker;
         json::value retVal = getJson(base, params, end);
 
-        if (retVal.is_null()) {
+        if (retVal.is_null() || retVal[U("c")].as_double() <= 0) {
             CPPFINANCIALDATA_ERROR("No quote data received for ticker input: {}", ticker);
             throw std::runtime_error("Try another symbol");
         }
@@ -68,7 +68,7 @@ namespace PriceData
 
         unordered_map<string, double> res;
 
-        if (retVal.is_null()) {
+        if (retVal.is_null() || retVal[U("a")].as_double() <= 0) {
             CPPFINANCIALDATA_ERROR("No bid/ask data received for ticker input: {}", ticker);
             throw std::runtime_error("Try another symbol");
         }

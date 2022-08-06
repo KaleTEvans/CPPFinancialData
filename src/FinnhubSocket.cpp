@@ -1,6 +1,6 @@
 #include "FinancialData/FinnhubSocket.h"
 #include "Keys.h"
-#include "Logger.h"
+#include "FinancialData/Logger.h"
 
 PriceData::FSocket::FSocket(std::vector<std::string>& tickers) {
         // Add ticker values to array
