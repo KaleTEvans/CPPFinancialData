@@ -28,7 +28,7 @@ In the future, planned additions are:
 * Stream current price data for up to 10 different tickers
 
 ```c++
-PriceData::FSocket* socket = new PriceData::FSocket(std::vector<std::string>& tickers)
+PriceData::FSocket* socket = new PriceData::FSocket(std::vector<std::string>& tickers);
 socket->openSocket() // Adds tickers to queue and calls runSocket(), which opens up the socket connection
 // Run for specified amount of time
 delete socket; // Calls closeSocket() and ends socket connection
@@ -40,7 +40,7 @@ delete socket; // Calls closeSocket() and ends socket connection
 * Get various data points for a single ticker
 
 ```c++
-unordered_map<string, double> PriceData::getQuote(string ticker)
+unordered_map<string, double> PriceData::getQuote(string ticker);
 // Returns the following values:
 "current" // current price
 "pctchange" // percent change
@@ -49,7 +49,7 @@ unordered_map<string, double> PriceData::getQuote(string ticker)
 "open" // opening price
 "prevclose" // close from previous day  
 
-unordered_map<string, double> PriceData::latestBidAsk(string ticker)
+unordered_map<string, double> PriceData::latestBidAsk(string ticker);
 // Returns the following values
 "ask"
 "askvol"
@@ -62,7 +62,7 @@ unordered_map<string, double> PriceData::latestBidAsk(string ticker)
 * Get fundamental data about a certain stock
 
 ```c++
-unordered_map<string, double> Fundamentals::NewsSentiment(string ticker)
+unordered_map<string, double> Fundamentals::NewsSentiment(string ticker);
 // Returns various news sentiment scores and traffic
 "articlesinlastweek" 
 "buzz" // score for amount of current news traffic
@@ -73,10 +73,10 @@ unordered_map<string, double> Fundamentals::NewsSentiment(string ticker)
 "bearsentiment"
 "bullsentiment"
 
-json::value Fundamentals::getFinancialData(string ticker, string metric)
+json::value Fundamentals::getFinancialData(string ticker, string metric);
 // This is left as a json object because there are hundreds of metrics to choose from 
 
-unordered_map<string, double> Fundamentals::earningsUpcoming(string ticker) 
+unordered_map<string, double> Fundamentals::earningsUpcoming(string ticker) ;
 // Returns the closest upcoming earnings data
 "date" // YYYY-MM-DD
 "quarter"
@@ -84,10 +84,10 @@ unordered_map<string, double> Fundamentals::earningsUpcoming(string ticker)
 "timecode"
 "year"
 
-std::pair<long, int> Fundamentals::twitterMentions(string ticker)
+std::pair<long, int> Fundamentals::twitterMentions(string ticker);
 // Returns the unix stamp and number of tweets about the specific ticker within the last hour
 
-vector<SupplyChainRelations*> Fundamentals::supplyChainData(string ticker)
+vector<SupplyChainRelations*> Fundamentals::supplyChainData(string ticker);
 // Returns suppliers and customers for a certain company
 // View the FinnhubConnections.h to see what data points are contained in the SupplyChainRelations type
 ```
