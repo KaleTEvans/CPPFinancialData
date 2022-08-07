@@ -236,3 +236,32 @@ namespace Fundamentals
         return res;
     }
 }
+
+namespace TechnicalData
+{
+    vector<ChartPatternData*> getChartPatterns(string ticker, string resolution) {
+        string params = "/scan/pattern?symbol=" + ticker + "&resolution=D";
+        json::value retVal = getJson(base, params, end);
+
+        vector<ChartPatternData*> res;
+
+        auto chartPatternArray = retVal[U("points")].as_array();
+        // This doesn't need to throw an error because there are several time frames with no data
+        if (chartPatternArray.size() < 1) {
+            CPPFINANCIALDATA_WARN("There is no data for {} at the {} resolution", ticker, resolution);
+            throw std::runtime_error("Try another symbol or time frame");
+        }
+
+        for (auto it = chartPatternArray.begin(); it != chartPatternArray.end(); ++it) {
+            auto data = *it;
+            json::value dataObj = data;
+
+            if (data[U("patterntype")].as_string() == "unknown") continue;
+            ChartPatternData* temp = new ChartPatternData(data, ticker, resolution);
+
+            res.push_back(temp);
+        }
+
+        return res;
+    }
+}
