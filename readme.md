@@ -91,3 +91,26 @@ vector<SupplyChainRelations*> Fundamentals::supplyChainData(string ticker);
 // Returns suppliers and customers for a certain company
 // View the FinnhubConnections.h to see what data points are contained in the SupplyChainRelations type
 ```
+
+### TechnicalData namespace
+* Get technical indicators for a given ticker and time resolution (1, 5, 15, 30, 60, D, W, M)
+* NOTE: Default resolution is one day (D)
+
+```c++
+ vector<ChartPatternData*> getChartPatterns(const string ticker, string resolution);
+ // Returns an array of chart pattern data types
+ // These are all public data members
+ string patternName; // Get the name of the current chart pattern
+ string patternType; // Bullish or Bearish
+ string status; // Complete or Incomplete
+ vector<pair<string, float>> pricePoints; // Contains the price points and unix times that form the pattern
+
+ vector<double> getSupportAndResistance(string ticker, string resolution);
+ // Returns a vector of support and resistance prices
+
+ AggregateData getAggregateIndicators(string ticker, string resolution);
+ // Returns AggregateData type containing three public members
+ string signal; // Bullish, bearish, or neutral
+ double adx; // ADX reading
+ bool trend; // Whether the ADX indicates the stock is trending
+```
