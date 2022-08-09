@@ -44,10 +44,7 @@ namespace PriceData
         string params = "quote?symbol=" + ticker;
         json::value retVal = getJson(base, params, end);
 
-        if (retVal.is_null() || retVal[U("c")].as_double() <= 0) {
-            CPPFINANCIALDATA_ERROR("No quote data received for ticker input: {}", ticker);
-            throw std::runtime_error("Try another symbol");
-        }
+        if (retVal.is_null() || retVal[U("c")].as_double() <= 0) CPPFINANCIALDATA_ERROR("No quote data received for ticker input: {}", ticker);
 
         unordered_map<string, double> res;
 
@@ -68,10 +65,7 @@ namespace PriceData
 
         unordered_map<string, double> res;
 
-        if (retVal.is_null() || retVal[U("a")].as_double() <= 0) {
-            CPPFINANCIALDATA_ERROR("No bid/ask data received for ticker input: {}", ticker);
-            throw std::runtime_error("Try another symbol");
-        }
+        if (retVal.is_null() || retVal[U("a")].as_double() <= 0) CPPFINANCIALDATA_ERROR("No bid/ask data received for ticker input: {}", ticker);
 
         // Values
         res.insert({"ask", retVal[U("a")].as_double()});
@@ -95,10 +89,7 @@ namespace Fundamentals
         json::value buzz = retVal[U("buzz")];
         json::value sentiment = retVal[U("sentiment")];
 
-        if (buzz.is_null()) {
-            CPPFINANCIALDATA_ERROR("No news sent data received for ticker input: {}", ticker);
-            throw std::runtime_error("Try another symbol");
-        }
+        if (buzz.is_null()) CPPFINANCIALDATA_ERROR("No news sent data received for ticker input: {}", ticker);
 
         res.insert({"articlesinlastweek", buzz[U("articlesInLastWeek")].as_double()});
         res.insert({"buzz", buzz[U("buzz")].as_double()});
@@ -123,10 +114,7 @@ namespace Fundamentals
 
         json::value retVal = getJson(base, params, end);
 
-        if (retVal[U("metric")].is_null()) {
-            CPPFINANCIALDATA_ERROR("No financial data received for ticker input: {}", ticker);
-            throw std::runtime_error("Try another symbol");
-        }
+        if (retVal[U("metric")].is_null()) CPPFINANCIALDATA_ERROR("No financial data received for ticker input: {}", ticker);
 
         return retVal;
     }
@@ -140,12 +128,9 @@ namespace Fundamentals
         string params = "/calendar/earnings?from=" + start + "&to=" + endDate + "&symbol=" + ticker;
         json::value retVal = getJson(base, params, end);
 
-        auto earningsArr = retVal[U("earningsCalendar")].as_array();
+        if (retVal[U("earningsCalendar")].is_null()) CPPFINANCIALDATA_ERROR("No earnings data received for ticker input: {}", ticker);
 
-        if (earningsArr.size() < 1) {
-            CPPFINANCIALDATA_ERROR("No earnings data received for ticker input: {}", ticker);
-            throw std::runtime_error("Try another symbol");
-        }
+        auto earningsArr = retVal[U("earningsCalendar")].as_array();
 
         json::value earnings = earningsArr[earningsArr.size()-1];
 
@@ -174,12 +159,10 @@ namespace Fundamentals
         string params = "/stock/social-sentiment?symbol=" + ticker;
         json::value retVal = getJson(base, params, end);
 
-        auto twitArr = retVal[U("twitter")].as_array();
-        
-        if (twitArr.size() < 1) {
+        if (retVal[U("twitter")].is_null() || retVal[U("twitter")].as_array().size() < 1) 
             CPPFINANCIALDATA_ERROR("No twitter data received for ticker input: {}", ticker);
-            throw std::runtime_error("Try another symbol");
-        }
+
+        auto twitArr = retVal[U("twitter")].as_array();
 
         auto current = twitArr[0].as_object();
 
@@ -196,12 +179,9 @@ namespace Fundamentals
 
         vector<SupplyChainRelations*> res;
 
+        if (retVal[U("data")].is_null()) CPPFINANCIALDATA_ERROR("No supply chain data received for ticker input: {}", ticker);
+
         auto supplyChainArr = retVal[U("data")].as_array();
-        
-        if (supplyChainArr.size() < 1) {
-            CPPFINANCIALDATA_ERROR("No supply chain data received for ticker input: {}", ticker);
-            throw std::runtime_error("Try another symbol");
-        }
 
         for (auto it = supplyChainArr.begin(); it != supplyChainArr.end(); ++it) {
             auto data = *it;
@@ -239,18 +219,15 @@ namespace Fundamentals
 
 namespace TechnicalData
 {
-    vector<ChartPatternData*> getChartPatterns(string ticker, string resolution) {
-        string params = "/scan/pattern?symbol=" + ticker + "&resolution=D";
+    vector<ChartPatternData*> getChartPatterns(const string ticker, string resolution) {
+        string params = "/scan/pattern?symbol=" + ticker + "&resolution=" + resolution;
         json::value retVal = getJson(base, params, end);
 
         vector<ChartPatternData*> res;
 
+        if (retVal[U("status")].is_null()) CPPFINANCIALDATA_WARN("There is no pattern data for {} at the {} resolution", ticker, resolution);
+
         auto chartPatternArray = retVal[U("points")].as_array();
-        // This doesn't need to throw an error because there are several time frames with no data
-        if (chartPatternArray.size() < 1) {
-            CPPFINANCIALDATA_WARN("There is no data for {} at the {} resolution", ticker, resolution);
-            throw std::runtime_error("Try another symbol or time frame");
-        }
 
         for (auto it = chartPatternArray.begin(); it != chartPatternArray.end(); ++it) {
             auto data = *it;
@@ -262,6 +239,40 @@ namespace TechnicalData
             res.push_back(temp);
         }
 
+        return res;
+    }
+
+    vector<double> getSupportAndResistance(const string ticker, string resolution) {
+        string params = "/scan/support-resistance?symbol=" + ticker + "&resolution=" + resolution;
+        json::value retVal = getJson(base, params, end);
+        
+        vector<double> res;
+
+        if (retVal[U("levels")].is_null()) CPPFINANCIALDATA_WARN("There is no support/resistance data for {}", ticker);
+
+        auto levelData = retVal[U("levels")].as_array();
+
+        for (auto it = levelData.begin(); it != levelData.end(); ++it) {
+            auto data = *it;
+            json::value dataObj = data;
+
+            res.push_back(dataObj.as_double());
+        }
+
+        return res;
+    }
+
+    AggregateData getAggregateIndicators(const string ticker, string resoluition) {
+        string params = "/scan/technical-indicator?symbol=" + ticker + "&resolution=" + resoluition;
+        json::value retVal = getJson(base, params, end);
+
+        if (retVal.at("technicalAnalysis").at("signal").is_null()) CPPFINANCIALDATA_WARN("There is no aggregate data for {}", ticker);
+
+        string signal = retVal.at("technicalAnalysis").at("signal").as_string();
+        double adx = retVal.at("trend").at("adx").as_double();
+        bool trending = retVal.at("trend").at("trending").as_bool();
+
+        AggregateData res(signal, adx, trending);
         return res;
     }
 }

@@ -5,15 +5,15 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include <memory>
 
-#define CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME "datalogger"
+#define CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME "financialdatalog"
 
 #ifndef CPPFINANCIALDATA_CONFIG_RELEASE
 #define CPPFINANCIALDATA_TRACE(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->trace(__VA_ARGS__);}
-#define CPPFINANCIALDATA_DEBUG(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->trace(__VA_ARGS__);}
-#define CPPFINANCIALDATA_INFO(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->trace(__VA_ARGS__);}
-#define CPPFINANCIALDATA_WARN(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->trace(__VA_ARGS__);}
-#define CPPFINANCIALDATA_ERROR(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->trace(__VA_ARGS__);}
-#define CPPFINANCIALDATA_FATAL(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->trace(__VA_ARGS__);}
+#define CPPFINANCIALDATA_DEBUG(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->debug(__VA_ARGS__);}
+#define CPPFINANCIALDATA_INFO(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->info(__VA_ARGS__);}
+#define CPPFINANCIALDATA_WARN(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->warn(__VA_ARGS__);}
+#define CPPFINANCIALDATA_ERROR(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->error(__VA_ARGS__);}
+#define CPPFINANCIALDATA_FATAL(...) if (spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME) != nullptr) {spdlog::get(CPPFINANCIALDATA_DEFAULT_LOGGGER_NAME)->critical(__VA_ARGS__);}
 
 #else
 // Disable logging for release builds
@@ -33,9 +33,9 @@ namespace managers
             ~LogManager() = default;
 
             void Initialize() {
-                auto consoleSink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+                auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
                 consoleSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%l] %v%$");
-                auto fileLogger = std::make_shared<spdlog::sinks::basic_file_sink_mt>("../logs/logs.txt", true);
+                auto fileLogger = std::make_shared<spdlog::sinks::basic_file_sink_mt>("../../logs/logs.txt");
                 fileLogger->set_pattern("[%Y-%m-%d %H:%M:%S] [%l] [%@] %v");
 
                 std::vector<spdlog::sink_ptr> sinks{ consoleSink, fileLogger };

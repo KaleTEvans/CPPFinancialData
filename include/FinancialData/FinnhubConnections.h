@@ -100,8 +100,21 @@ namespace TechnicalData
             // a trade or price or need to be identified by a chart
     };
 
+    class AggregateData {
+        public:
+            AggregateData(string signal, double adx, bool trending) :
+                signal(signal), adx(adx), trending(trending) {}
+            ~AggregateData() {}
+
+            string signal;
+            double adx;
+            bool trending;
+    };
+
     /********* Stock Technical Analysis Data ***********/
-    vector<ChartPatternData*> getChartPatterns(string ticker, string resolution);
+    vector<ChartPatternData*> getChartPatterns(const string ticker, string resolution = "D");
+    vector<double> getSupportAndResistance(const string ticker, string resolution = "D");
+    AggregateData getAggregateIndicators(const string tickers, string resolution = "D");
 }
 
 #endif // FINNHUBCONNECTIONS_H

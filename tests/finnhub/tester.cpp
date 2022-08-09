@@ -19,17 +19,14 @@ int main(int argc, char** argv) {
         Fundamentals::newsSentiment(testIn);
         Fundamentals::getFinancialData(testIn);
         Fundamentals::earningsUpcoming(testIn);
-        //Fundamentals::twitterMentions(testIn);
+        // //Fundamentals::twitterMentions(testIn);
         Fundamentals::supplyChainData(testIn);
 
-        std::vector<TechnicalData::ChartPatternData*> temp = TechnicalData::getChartPatterns(testIn, "15");
-        for (auto i : temp) {
-            cout << "name" << i->patternName << endl;
-            cout << "type" << i->patternType << endl;
-            cout << "status" << i->status << endl;
-        }
+        TechnicalData::getChartPatterns(testIn, "15");
+        TechnicalData::getSupportAndResistance(testIn, "15");
+        TechnicalData::getAggregateIndicators(testIn, "D");
     } 
-    catch (std::runtime_error& e) {
+    catch (web::json::json_exception& e) {
         cout << e.what() << endl;
     }
 
