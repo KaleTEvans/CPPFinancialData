@@ -1,24 +1,7 @@
 #ifndef FINNHUBSOCKET_H
 #define FINNHUBSOCKET_H
 
-#include <iostream>
-#include <ctime>
-#include <unordered_map>
-#include <vector>
-#include <cpprest/http_client.h>
-#include <cpprest/filestream.h>
-#include <cpprest/uri.h>
-#include <cpprest/json.h>
-#include <cpprest/ws_client.h>
-
-using namespace utility;
-using namespace web;
-using namespace pplx;
-using namespace concurrency::streams;
-using namespace web::websockets::client;
-using namespace utility::conversions;
-using namespace web::http;
-using namespace web::http::client;
+#include "FormatRequest.h"
 
 namespace PriceData
 {

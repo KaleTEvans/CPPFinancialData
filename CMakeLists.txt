@@ -22,10 +22,12 @@ target_sources(${PROJECT_NAME}
         src/FinnhubConnections.cpp
         src/FinnhubSocket.cpp
         src/AlphaVantage.cpp
+        src/FormatRequest.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} 
     cpprestsdk::cpprest
+    spdlog
 )
 
 target_include_directories(${PROJECT_NAME}

@@ -6,43 +6,12 @@
 const string base = "https://finnhub.io/api/v1/";
 string end = "&token=" + finnHubKey;
 
-json::value getJson(string base, string link, string end) {
-    json::value retVal;
-
-    auto requestJson = http_client(U(base))
-        .request(methods::GET,
-            uri_builder(U(link + end)).to_string())
-    // Get the response
-    .then([](http_response response) {
-        // Check the status code.
-        if (response.status_code() != 200) {
-            throw std::runtime_error("Returned " + std::to_string(response.status_code()));
-        }
-
-        // Convert the response body to JSON object.
-        return response.extract_json();
-    })
-    // get the data field
-    .then([&](json::value jsonObject) {
-        retVal = jsonObject;
-    });
-
-    // Wait for the concurrent tasks to finish.
-    try {
-        requestJson.wait();
-    } catch (const std::exception &e) {
-        printf("Error exception:%s\n", e.what());
-    }
-
-    return retVal;
-}
-
 namespace PriceData 
 {
     /******** Stock Price Info **********/
     unordered_map<string, double> getQuote(const string ticker) {
         string params = "quote?symbol=" + ticker;
-        json::value retVal = getJson(base, params, end);
+        json::value retVal = Connect::getJson(base, params, end);
 
         if (retVal.is_null() || retVal[U("c")].as_double() <= 0) CPPFINANCIALDATA_ERROR("No quote data received for ticker input: {}", ticker);
 
@@ -61,7 +30,7 @@ namespace PriceData
 
     unordered_map<string, double> latestBidAsk(const string ticker) {
         string params = "stock/bidask?symbol=" + ticker;
-        json::value retVal = getJson(base, params, end);
+        json::value retVal = Connect::getJson(base, params, end);
 
         unordered_map<string, double> res;
 
@@ -82,7 +51,7 @@ namespace Fundamentals
 {
     unordered_map<string, double> newsSentiment(const string ticker) {
         string params = "/news-sentiment?symbol=" + ticker;
-        json::value retVal = getJson(base, params, end);
+        json::value retVal = Connect::getJson(base, params, end);
 
         unordered_map<string, double> res;
 
@@ -112,7 +81,7 @@ namespace Fundamentals
             params = "/stock/metric?symbol=" + ticker + "&metric=all";
         }
 
-        json::value retVal = getJson(base, params, end);
+        json::value retVal = Connect::getJson(base, params, end);
 
         if (retVal[U("metric")].is_null()) CPPFINANCIALDATA_ERROR("No financial data received for ticker input: {}", ticker);
 
@@ -126,7 +95,7 @@ namespace Fundamentals
         string endDate = TimeConversions::convertUnixToTime(future);
 
         string params = "/calendar/earnings?from=" + start + "&to=" + endDate + "&symbol=" + ticker;
-        json::value retVal = getJson(base, params, end);
+        json::value retVal = Connect::getJson(base, params, end);
 
         if (retVal[U("earningsCalendar")].is_null()) CPPFINANCIALDATA_ERROR("No earnings data received for ticker input: {}", ticker);
 
@@ -157,7 +126,7 @@ namespace Fundamentals
 
     std::pair<long, int> twitterMentions(const string ticker) {
         string params = "/stock/social-sentiment?symbol=" + ticker;
-        json::value retVal = getJson(base, params, end);
+        json::value retVal = Connect::getJson(base, params, end);
 
         if (retVal[U("twitter")].is_null() || retVal[U("twitter")].as_array().size() < 1) 
             CPPFINANCIALDATA_ERROR("No twitter data received for ticker input: {}", ticker);
@@ -175,7 +144,7 @@ namespace Fundamentals
 
     vector<SupplyChainRelations*> supplyChainData(const string ticker) {
         string params = "/stock/supply-chain?symbol=" + ticker;
-        json::value retVal = getJson(base, params, end);
+        json::value retVal = Connect::getJson(base, params, end);
 
         vector<SupplyChainRelations*> res;
 
@@ -221,7 +190,7 @@ namespace TechnicalData
 {
     vector<ChartPatternData*> getChartPatterns(const string ticker, string resolution) {
         string params = "/scan/pattern?symbol=" + ticker + "&resolution=" + resolution;
-        json::value retVal = getJson(base, params, end);
+        json::value retVal = Connect::getJson(base, params, end);
 
         vector<ChartPatternData*> res;
 
@@ -244,7 +213,7 @@ namespace TechnicalData
 
     vector<double> getSupportAndResistance(const string ticker, string resolution) {
         string params = "/scan/support-resistance?symbol=" + ticker + "&resolution=" + resolution;
-        json::value retVal = getJson(base, params, end);
+        json::value retVal = Connect::getJson(base, params, end);
         
         vector<double> res;
 
@@ -264,7 +233,7 @@ namespace TechnicalData
 
     AggregateData getAggregateIndicators(const string ticker, string resoluition) {
         string params = "/scan/technical-indicator?symbol=" + ticker + "&resolution=" + resoluition;
-        json::value retVal = getJson(base, params, end);
+        json::value retVal = Connect::getJson(base, params, end);
 
         if (retVal.at("technicalAnalysis").at("signal").is_null()) CPPFINANCIALDATA_WARN("There is no aggregate data for {}", ticker);
 

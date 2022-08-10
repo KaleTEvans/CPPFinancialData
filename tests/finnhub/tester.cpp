@@ -1,10 +1,8 @@
-#include <iostream>
 #include "FinancialData/FinnhubConnections.h"
 #include "FinancialData/Logger.h"
 
 using std::cout;
 using std::endl;
-using std::string;
 
 int main(int argc, char** argv) {
     managers::LogManager log;

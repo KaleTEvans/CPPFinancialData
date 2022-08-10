@@ -12,6 +12,13 @@ $ cd CPPFinancialData && mkdir build && cd build
 $ cmake .. && make 
 ```
 
+## Required Libraries
+* cpprestsdk
+```sudo apt-get install libcpprest-dev```
+
+* spdlog
+```sudo apt install libspdlog-dev```
+
 ## Platforms 
 * Linux
 

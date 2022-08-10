@@ -78,7 +78,6 @@ void PriceData::FSocket::closeSocket() {
         client.close().wait();
     }
     catch (std::error_code& code) {
-        CPPFINANCIALDATA_ERROR("Issue closing FSocket");
         std::cout << "ERROR: " << code << std::endl;
     }
 }

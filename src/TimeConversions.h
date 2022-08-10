@@ -15,7 +15,7 @@ using std::string;
 namespace TimeConversions 
 {
     // Time Conversion Functions
-        long convertTimeToUnix(string date) {
+    long convertTimeToUnix(string date) {
         std::tm t{};
         std::istringstream in(date);
         
