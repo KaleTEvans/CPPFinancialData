@@ -1,5 +1,5 @@
-#ifndef FINNHUBSOCKET_H
-#define FINNHUBSOCKET_H
+#ifndef PRICEDATA_H
+#define PRICEDATA_H
 
 #include "FormatRequest.h"
 
@@ -25,6 +25,9 @@ namespace PriceData
             std::vector<std::string> ledger;
             std::unordered_map<std::string, double> tickerPrice;
     };
+
+    unordered_map<string, double> getQuote(const string ticker);
+    unordered_map<string, double> latestBidAsk(const string ticker); 
 }
 
-#endif // FINNHUBSOCKET_H
+#endif // PRICEDATA_H

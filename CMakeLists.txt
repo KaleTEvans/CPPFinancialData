@@ -19,10 +19,11 @@ find_package(cpprestsdk REQUIRED)
 
 target_sources(${PROJECT_NAME}
     PRIVATE
-        src/FinnhubConnections.cpp
-        src/FinnhubSocket.cpp
-        src/AlphaVantage.cpp
         src/FormatRequest.cpp
+        src/TimeConversions.cpp
+        src/FundamentalData.cpp
+        src/PriceData.cpp
+        src/TechnicalData.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} 

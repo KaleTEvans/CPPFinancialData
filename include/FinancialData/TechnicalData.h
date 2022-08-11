@@ -1,43 +1,7 @@
-#ifndef FINNHUBCONNECTIONS_H
-#define FINNHUBCONNECTIONS_H
+#ifndef TECHNICALDATA_H
+#define TECHNICALDATA_H
 
 #include "FormatRequest.h"
-
-namespace PriceData
-{
-    /******** Stock Price Info **********/
-    unordered_map<string, double> getQuote(const string ticker);
-    unordered_map<string, double> latestBidAsk(const string ticker); 
-}
-
-namespace Fundamentals 
-{
-    /******* Fundamental Data Types ********/
-    class SupplyChainRelations {
-        public:
-            SupplyChainRelations(string ticker, bool customer, bool supplier, string relatedSymbol,
-                float twoWkCorrelation, float oneMonthCorrelation, float oneYrCorrelation) :
-                    ticker(ticker), customer(customer), supplier(supplier), relatedSymbol(relatedSymbol),
-                    twoWkCorrelation(twoWkCorrelation), oneMonthCorrelation(oneMonthCorrelation),
-                    oneYrCorrelation(oneYrCorrelation) {}
-            ~SupplyChainRelations() {}
-
-            string ticker;
-            bool customer;
-            bool supplier;
-            string relatedSymbol;
-            float twoWkCorrelation;
-            float oneMonthCorrelation;
-            float oneYrCorrelation;
-    };
-
-    /******** Stock Fundamental Info ********/
-    unordered_map<string, double> newsSentiment(const string ticker);
-    std::pair<long, int> twitterMentions(const string ticker);
-    json::value getFinancialData(const string ticker, string metric = "");
-    unordered_map<string, double> earningsUpcoming(const string ticker);
-    vector<SupplyChainRelations*> supplyChainData(const string ticker);
-}
 
 namespace TechnicalData 
 {
@@ -95,10 +59,9 @@ namespace TechnicalData
             bool trending;
     };
 
-    /********* Stock Technical Analysis Data ***********/
     vector<ChartPatternData*> getChartPatterns(const string ticker, string resolution = "D");
     vector<double> getSupportAndResistance(const string ticker, string resolution = "D");
     AggregateData getAggregateIndicators(const string tickers, string resolution = "D");
 }
 
-#endif // FINNHUBCONNECTIONS_H
+#endif // TECHNICALDATA_H

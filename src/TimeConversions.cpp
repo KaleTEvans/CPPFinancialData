@@ -1,16 +1,4 @@
-#ifndef TIMECONVERSIONS_H
-#define TIMECONVERSIONS_H
-
-#include <iostream>
-#include <iomanip>
-#include <ctime>
-#include <chrono>
-#include <vector>
-
-using std::cout;
-using std::cin;
-using std::endl;
-using std::string;
+#include "FinancialData/TimeConversions.h"
 
 namespace TimeConversions 
 {
@@ -35,12 +23,12 @@ namespace TimeConversions
         char time_buf[80];
         struct tm ts;
         ts = *localtime(&date);
-        strftime(time_buf, sizeof(time_buf), "%Y-%m-%d", &ts);
+        strftime(time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S", &ts);
         string str(time_buf);
         return time_buf;
     }
 
-    long convertToCST(long unixTime, long seconds = 18000) {
+    long convertToCST(long unixTime, long seconds) {
         return unixTime - seconds;
     }
 
@@ -67,5 +55,3 @@ namespace TimeConversions
         return result;
     }
 }
-
-#endif // TIMECONVERSIONS_H

@@ -11,6 +11,8 @@
 #include <cpprest/json.h>
 #include <cpprest/ws_client.h>
 
+#include "Logger.h"
+
 using namespace utility;
 using namespace web;
 using namespace pplx;
