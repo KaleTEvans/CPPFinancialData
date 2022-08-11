@@ -16,6 +16,7 @@ namespace TimeConversions
 {
     // Time Conversion Functions
     long convertTimeToUnix(string date);
+    string convertUnixToDate(time_t date);
     string convertUnixToTime(time_t date);
     long convertToCST(long unixTime, long seconds = 18000);
     string getDayOfWeek(string date);

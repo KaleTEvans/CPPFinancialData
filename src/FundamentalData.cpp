@@ -5,29 +5,6 @@
 
 namespace Fundamentals
 {
-    unordered_map<string, double> newsSentiment(const string ticker) {
-        string params = "/news-sentiment?symbol=" + ticker;
-        json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
-
-        unordered_map<string, double> res;
-
-        json::value buzz = retVal[U("buzz")];
-        json::value sentiment = retVal[U("sentiment")];
-
-        if (buzz.is_null()) CPPFINANCIALDATA_ERROR("No news sent data received for ticker input: {}", ticker);
-
-        res.insert({"articlesinlastweek", buzz[U("articlesInLastWeek")].as_double()});
-        res.insert({"buzz", buzz[U("buzz")].as_double()});
-        res.insert({"weeklyaverage", buzz[U("weeklyAverage")].as_double()});
-        res.insert({"companynewsscore", retVal[U("companyNewsScore")].as_double()});
-        res.insert({"sectoravgbullishpct", retVal[U("sectorAverageBullishPercent")].as_double()});
-        res.insert({"sectoravgnewsscore", retVal[U("sectorAverageNewsScore")].as_double()});
-        res.insert({"bearsentiment", sentiment[U("bearishPercent")].as_double()});
-        res.insert({"bullsentiment", sentiment[U("bullishPercent")].as_double()});
-
-        return res;
-    }
-
     json::value getFinancialData(const string ticker, string metric) {
         // if no metric is given, provide all data points
         string params;
@@ -37,7 +14,7 @@ namespace Fundamentals
             params = "/stock/metric?symbol=" + ticker + "&metric=all";
         }
 
-        json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
+        json::value retVal = Connect::getJson(finnhubUrl, params, privateFinnhubToken);
 
         if (retVal[U("metric")].is_null()) CPPFINANCIALDATA_ERROR("No financial data received for ticker input: {}", ticker);
 
@@ -47,11 +24,11 @@ namespace Fundamentals
     unordered_map<string, double> earningsUpcoming(const string ticker) {
         time_t now = time(0);
         time_t future = now + 31536000;
-        string start = TimeConversions::convertUnixToTime(now);
-        string endDate = TimeConversions::convertUnixToTime(future);
+        string start = TimeConversions::convertUnixToDate(now);
+        string endDate = TimeConversions::convertUnixToDate(future);
 
         string params = "/calendar/earnings?from=" + start + "&to=" + endDate + "&symbol=" + ticker;
-        json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
+        json::value retVal = Connect::getJson(finnhubUrl, params, privateFinnhubToken);
 
         if (retVal[U("earningsCalendar")].is_null()) CPPFINANCIALDATA_ERROR("No earnings data received for ticker input: {}", ticker);
 
@@ -60,10 +37,10 @@ namespace Fundamentals
         json::value earnings = earningsArr[earningsArr.size()-1];
 
         unordered_map<string, double> res;
-        long time = TimeConversions::convertTimeToUnix(earnings[U("date")].as_string());
+        time_t time = TimeConversions::convertTimeToUnix(earnings[U("date")].as_string());
 
-        res.insert({"date", time});
-        res.insert({"epsactual", earnings[U("epsEstimate")].as_double()});
+        res.insert({"unixTime", time});
+        res.insert({"epsestimate", earnings[U("epsEstimate")].as_double()});
         res.insert({"quarter", earnings[U("quarter")].as_double()});
 
         // 1 : before open, 2 : after close, 3 : during 
@@ -78,24 +55,6 @@ namespace Fundamentals
         res.insert({"year", earnings[U("year")].as_double()});
 
         return res;
-    }
-
-    std::pair<long, int> twitterMentions(const string ticker) {
-        string params = "/stock/social-sentiment?symbol=" + ticker;
-        json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
-
-        if (retVal[U("twitter")].is_null() || retVal[U("twitter")].as_array().size() < 1) 
-            CPPFINANCIALDATA_ERROR("No twitter data received for ticker input: {}", ticker);
-
-        auto twitArr = retVal[U("twitter")].as_array();
-
-        auto current = twitArr[0].as_object();
-
-        string dateTime = current[U("atTime")].as_string();
-        long unixTime = TimeConversions::convertTimeToUnix(dateTime);
-        int mentionCount = current[U("mention")].as_integer();
-
-        return {unixTime, mentionCount};
     }
 
     vector<SupplyChainRelations*> supplyChainData(const string ticker) {

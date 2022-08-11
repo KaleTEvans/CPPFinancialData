@@ -91,7 +91,7 @@ namespace PriceData
 
     unordered_map<string, double> getQuote(const string ticker) {
         string params = "quote?symbol=" + ticker;
-        json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
+        json::value retVal = Connect::getJson(finnhubUrl, params, privateFinnhubToken);
 
         if (retVal.is_null() || retVal[U("c")].as_double() <= 0) CPPFINANCIALDATA_ERROR("No quote data received for ticker input: {}", ticker);
 
@@ -99,7 +99,8 @@ namespace PriceData
 
         // Values
         res.insert({"current", retVal[U("c")].as_double()});
-        res.insert({"pctchange", retVal[U("d")].as_double()});
+        res.insert({"pricechange", retVal[U("d")].as_double()});
+        res.insert({"pctchange", retVal[U("dp")].as_double()});
         res.insert({"highofday", retVal[U("h")].as_double()});
         res.insert({"lowofday", retVal[U("l")].as_double()});
         res.insert({"open", retVal[U("o")].as_double()});
@@ -121,7 +122,7 @@ namespace PriceData
         res.insert({"askvol", retVal[U("av")].as_double()});
         res.insert({"bid", retVal[U("b")].as_double()});
         res.insert({"bidvol", retVal[U("bv")].as_double()});
-        res.insert({"time", retVal[U("t")].as_double()});
+        res.insert({"time", retVal[U("t")].as_double() / 1000});
 
         return res;
     }

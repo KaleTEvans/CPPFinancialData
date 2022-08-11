@@ -19,6 +19,15 @@ namespace TimeConversions
         return res;
     }
 
+    string convertUnixToDate(time_t date) {
+        char time_buf[80];
+        struct tm ts;
+        ts = *localtime(&date);
+        strftime(time_buf, sizeof(time_buf), "%Y-%m-%d", &ts);
+        string str(time_buf);
+        return time_buf;
+    }
+
     string convertUnixToTime(time_t date) {
         char time_buf[80];
         struct tm ts;

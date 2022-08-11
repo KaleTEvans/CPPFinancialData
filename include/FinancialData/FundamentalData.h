@@ -24,8 +24,6 @@ namespace Fundamentals
             float oneYrCorrelation;
     };
 
-    unordered_map<string, double> newsSentiment(const string ticker);
-    std::pair<long, int> twitterMentions(const string ticker);
     json::value getFinancialData(const string ticker, string metric = "");
     unordered_map<string, double> earningsUpcoming(const string ticker);
     vector<SupplyChainRelations*> supplyChainData(const string ticker);

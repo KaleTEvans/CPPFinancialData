@@ -24,6 +24,7 @@ target_sources(${PROJECT_NAME}
         src/FundamentalData.cpp
         src/PriceData.cpp
         src/TechnicalData.cpp
+        src/NewsData.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} 
@@ -47,10 +48,13 @@ install(FILES "${PROJECT_BINARY_DIR}/FinancialDataConfig.h" DESTINATION include)
 
 # test logic
 option(TEST_FINNHUB "Test library for finnhub endpoints" ON)
+option(TEST_FMP "Test library for fmp endpoints" ON)
 
 configure_file(FinancialDataConfig.h.in FinancialDataConfig.h)
 
 include(CTest)
 
-add_subdirectory(tests)
+if (TEST_FINNHUB OR TEST_FMP)
+    add_subdirectory(tests)
+endif()
 
