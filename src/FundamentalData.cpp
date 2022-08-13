@@ -32,7 +32,7 @@ namespace Fundamentals
         Earnings upcoming;
 
         if (retVal[U("earningsCalendar")].is_null()) {
-            CPPFINANCIALDATA_ERROR("No earnings data received for ticker input: {}", ticker);
+            CPPFINANCIALDATA_WARN("No earnings data received for ticker input: {}", ticker);
         } else {
             auto earningsArr = retVal[U("earningsCalendar")].as_array();
 
@@ -78,6 +78,7 @@ namespace Fundamentals
                 historical.date = data[U("date")].as_string();
                 historical.unixTime = TimeConversions::convertTimeToUnix(historical.date);
                 historical.epsEstimate = data[U("epsEstimated")].as_double();
+                historical.epsActual = data[U("eps")].as_double();
 
                 // 1 : before open, 2 : after close, 3 : during 
                 auto hour = data[U("time")].as_string();
@@ -102,7 +103,7 @@ namespace Fundamentals
         vector<SupplyChainRelations> res;
 
         if (retVal[U("data")].is_null()) {
-            CPPFINANCIALDATA_ERROR("No supply chain data received for ticker input: {}", ticker)
+            CPPFINANCIALDATA_WARN("No supply chain data received for ticker input: {}", ticker)
         } else {
             auto supplyChainArr = retVal[U("data")].as_array();
 
@@ -134,6 +135,61 @@ namespace Fundamentals
                 temp.customer = dataObj[U("customer")].as_bool();
                 temp.supplier = dataObj[U("supplier")].as_bool();
                 temp.relatedSymbol = dataObj[U("symbol")].as_string();
+
+                res.push_back(temp);
+            }
+        }
+
+        return res;
+    }
+
+    FinancialScores getFinancialScores(const string ticker) {
+        string params1 = "/ratios-ttm/" + ticker + "?";
+        json::value retVal1 = Connect::getJson(fmpUrl, params1, fmpToken);
+        string params2 = "score?symbol=" + ticker + "&";
+        json::value retVal2 = Connect::getJson("https://financialmodelingprep.com/api/v4/", params2, fmpToken);
+
+        FinancialScores res;
+        auto ret1 = retVal1.as_array();
+        auto ret2 = retVal2.as_array();
+
+        if (ret1[0][U("peRatioTTM")].is_null()) CPPFINANCIALDATA_ERROR("No financial scores for the ticker: {}", ticker);
+
+        res.peRatio = ret1[0][U("peRatioTTM")].as_double();
+        res.pegRatio = ret1[0][U("pegRatioTTM")].as_double();
+        res.debtRatio = ret1[0][U("debtRatioTTM")].as_double();
+        res.debtEquityRatio = ret1[0][U("debtEquityRatioTTM")].as_double();
+        res.priceFairValue = ret1[0][U("priceFairValueTTM")].as_double();
+        res.netProfitMargin = ret1[0][U("netProfitMarginTTM")].as_double();
+        res.piotroskiScore = ret2[0][U("piotroskiScore")].as_double();
+
+        return res;
+    }
+
+    vector<FinancialScores> getQuarterlyFinancialScores(const string ticker, string limit) {
+        string params = "/ratios/" + ticker + "?period=quarter&limit=" + limit + "&";
+        json::value retVal = Connect::getJson(fmpUrl, params, fmpToken);
+
+        vector<FinancialScores> res;
+        if (retVal.as_array().size() < 1) {
+            CPPFINANCIALDATA_WARN("No quarterly financial data avaliable for {}", ticker);
+        } else {
+            auto scoresArr = retVal.as_array();
+
+            for (auto it = scoresArr.begin(); it != scoresArr.end(); ++it) {
+                auto data = *it;
+                json::value dataObj = data;
+
+                FinancialScores temp;
+
+                temp.peRatio = dataObj[U("priceEarningsRatio")].as_double();
+                temp.pegRatio = dataObj[U("priceEarningsToGrowthRatio")].as_double();
+                temp.debtRatio = dataObj[U("debtRatio")].as_double();
+                temp.debtEquityRatio = dataObj[U("debtEquityRatio")].as_double();
+                temp.priceFairValue = dataObj[U("priceFairValue")].as_double();
+                temp.netProfitMargin = dataObj[U("netProfitMargin")].as_double();
+                temp.date = dataObj[U("date")].as_string();
+                temp.unixDate = TimeConversions::convertTimeToUnix(temp.date);
 
                 res.push_back(temp);
             }

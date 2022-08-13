@@ -25,6 +25,7 @@ target_sources(${PROJECT_NAME}
         src/PriceData.cpp
         src/TechnicalData.cpp
         src/NewsData.cpp
+        src/MacroData.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} 
