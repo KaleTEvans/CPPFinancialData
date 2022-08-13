@@ -4,11 +4,11 @@
 
 namespace TechnicalData
 {
-    vector<ChartPatternData*> getChartPatterns(const string ticker, string resolution) {
+    vector<ChartPatternData> getChartPatterns(const string ticker, string resolution) {
         string params = "/scan/pattern?symbol=" + ticker + "&resolution=" + resolution;
         json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
 
-        vector<ChartPatternData*> res;
+        vector<ChartPatternData> res;
 
         auto chartPatternArray = retVal[U("points")].as_array();
 
@@ -20,7 +20,7 @@ namespace TechnicalData
                 json::value dataObj = data;
 
                 if (data[U("patterntype")].as_string() == "unknown") continue;
-                ChartPatternData* temp = new ChartPatternData(data, ticker, resolution);
+                ChartPatternData temp(data, ticker, resolution);
 
                 res.push_back(temp);
             }

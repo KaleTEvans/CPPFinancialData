@@ -6,13 +6,23 @@
 
 namespace News
 {
+    class NewsSentiment {
+        public:
+            int articlesInLastWk;
+            double buzz;
+            double weeklyAvg;
+            float companyNewsScore;
+            float sectorAvgBullishPct;
+            float sectorAvgNewsScore;
+            float bearSentiment;
+            float bullSentiment;
+    };
+    
     class NewsArticle {
         public:
-            NewsArticle(string symbol, string date, long unixDate, string title, string text) : 
-                symbol(symbol), date(date), unixDate(unixDate), title(title), text(text) {
-                    localDate = TimeConversions::convertUnixToTime(unixDate);
-                }
-            ~NewsArticle() {}
+            NewsArticle(long unixDate) : unixDate(unixDate) {
+                localDate = TimeConversions::convertUnixToTime(unixDate);
+            }
 
             string symbol;
             string date;
@@ -23,9 +33,9 @@ namespace News
             string source = "";
     };
 
-    unordered_map<string, double> newsSentiment(const string ticker);
-    vector<NewsArticle*> getPressReleases(const string ticker, string limit = "");
-    vector<NewsArticle*> getSingleStockNews(const string ticker, string limit="");
+    NewsSentiment newsSentiment(const string ticker);
+    vector<NewsArticle> getPressReleases(const string ticker, string limit = "1");
+    vector<NewsArticle> getSingleStockNews(const string ticker, string limit="1");
 }
 
 #endif // NEWSDATA_H

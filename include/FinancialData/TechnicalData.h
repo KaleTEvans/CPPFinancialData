@@ -59,7 +59,7 @@ namespace TechnicalData
             bool trending;
     };
 
-    vector<ChartPatternData*> getChartPatterns(const string ticker, string resolution = "D");
+    vector<ChartPatternData> getChartPatterns(const string ticker, string resolution = "D");
     vector<double> getSupportAndResistance(const string ticker, string resolution = "D");
     AggregateData getAggregateIndicators(const string tickers, string resolution = "D");
 }

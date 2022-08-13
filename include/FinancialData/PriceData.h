@@ -26,8 +26,31 @@ namespace PriceData
             std::unordered_map<std::string, double> tickerPrice;
     };
 
-    unordered_map<string, double> getQuote(const string ticker);
-    unordered_map<string, double> latestBidAsk(const string ticker); 
+    class Quote {
+        public:
+            double current;
+            double priceChange;
+            double pctChange;
+            double high;
+            double low;
+            double open;
+            double prevClose;
+            long unixTime;
+            string localDate;
+    };
+
+    class BidAsk {
+        public:
+            double ask;
+            double askVol;
+            double bid;
+            double bidVol;
+            long unixTime;
+            string localDate;
+    };
+
+    Quote getQuote(const string ticker);
+    BidAsk latestBidAsk(const string ticker); 
 }
 
 #endif // PRICEDATA_H

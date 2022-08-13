@@ -21,7 +21,7 @@ namespace Fundamentals
         return retVal;
     }
 
-    unordered_map<string, double> earningsUpcoming(const string ticker) {
+    Earnings earningsUpcoming(const string ticker) {
         time_t now = time(0);
         time_t future = now + 31536000;
         string start = TimeConversions::convertUnixToDate(now);
@@ -29,72 +29,114 @@ namespace Fundamentals
 
         string params = "/calendar/earnings?from=" + start + "&to=" + endDate + "&symbol=" + ticker;
         json::value retVal = Connect::getJson(finnhubUrl, params, privateFinnhubToken);
+        Earnings upcoming;
 
-        if (retVal[U("earningsCalendar")].is_null()) CPPFINANCIALDATA_ERROR("No earnings data received for ticker input: {}", ticker);
+        if (retVal[U("earningsCalendar")].is_null()) {
+            CPPFINANCIALDATA_ERROR("No earnings data received for ticker input: {}", ticker);
+        } else {
+            auto earningsArr = retVal[U("earningsCalendar")].as_array();
 
-        auto earningsArr = retVal[U("earningsCalendar")].as_array();
+            json::value earnings = earningsArr[earningsArr.size()-1];
 
-        json::value earnings = earningsArr[earningsArr.size()-1];
+            upcoming.date = earnings[U("date")].as_string();
+            upcoming.unixTime = TimeConversions::convertTimeToUnix(earnings[U("date")].as_string());
 
-        unordered_map<string, double> res;
-        time_t time = TimeConversions::convertTimeToUnix(earnings[U("date")].as_string());
+            upcoming.epsEstimate = earnings[U("epsEstimate")].as_double();
+            upcoming.quarter = earnings[U("quarter")].as_double();
 
-        res.insert({"unixTime", time});
-        res.insert({"epsestimate", earnings[U("epsEstimate")].as_double()});
-        res.insert({"quarter", earnings[U("quarter")].as_double()});
+            // 1 : before open, 2 : after close, 3 : during 
+            auto hour = earnings[U("hour")].as_string();
+            int timeCode;
+            if (hour == "bmo") timeCode = 1;
+            else if (hour == "amc") timeCode = 2;
+            else if (hour == "dmh") timeCode = 3;
+            else timeCode = 0;
 
-        // 1 : before open, 2 : after close, 3 : during 
-        auto hour = earnings[U("hour")].as_string();
-        int timeCode;
-        if (hour == "bmo") timeCode = 1;
-        else if (hour == "amc") timeCode = 2;
-        else if (hour == "dmh") timeCode = 3;
-        else timeCode = 0;
+            upcoming.timeCode = timeCode;
+            upcoming.year = earnings[U("year")].as_double();
+        }
 
-        res.insert({"timecode", timeCode});
-        res.insert({"year", earnings[U("year")].as_double()});
+        return upcoming;
+    }
+
+    vector<Earnings> earningsHistorical(const string ticker, string limit) {
+        string params = "/historical/earning_calendar/" + ticker + "?limit=" + limit + "&";
+        json::value retVal = Connect::getJson(fmpUrl, params, fmpToken);
+
+        vector<Earnings> res;
+
+        if (retVal.as_array().size() < 1) {
+            CPPFINANCIALDATA_ERROR("No historical earnings data received for {}", ticker);
+        } else {
+            auto earnigsArr = retVal.as_array();
+
+            for (auto it = earnigsArr.begin(); it != earnigsArr.end(); ++it) {
+                auto data = *it;
+                json::value dataObj = data;
+                Earnings historical;
+
+                historical.date = data[U("date")].as_string();
+                historical.unixTime = TimeConversions::convertTimeToUnix(historical.date);
+                historical.epsEstimate = data[U("epsEstimated")].as_double();
+
+                // 1 : before open, 2 : after close, 3 : during 
+                auto hour = data[U("time")].as_string();
+                int timeCode;
+                if (hour == "bmo") timeCode = 1;
+                else if (hour == "amc") timeCode = 2;
+                else if (hour == "dmh") timeCode = 3;
+                else timeCode = 0;
+
+                historical.timeCode = timeCode;
+                res.push_back(historical);
+            }
+        }
 
         return res;
     }
 
-    vector<SupplyChainRelations*> supplyChainData(const string ticker) {
+    vector<SupplyChainRelations> supplyChainData(const string ticker) {
         string params = "/stock/supply-chain?symbol=" + ticker;
         json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
 
-        vector<SupplyChainRelations*> res;
+        vector<SupplyChainRelations> res;
 
-        if (retVal[U("data")].is_null()) CPPFINANCIALDATA_ERROR("No supply chain data received for ticker input: {}", ticker);
+        if (retVal[U("data")].is_null()) {
+            CPPFINANCIALDATA_ERROR("No supply chain data received for ticker input: {}", ticker)
+        } else {
+            auto supplyChainArr = retVal[U("data")].as_array();
 
-        auto supplyChainArr = retVal[U("data")].as_array();
+            for (auto it = supplyChainArr.begin(); it != supplyChainArr.end(); ++it) {
+                auto data = *it;
+                json::value dataObj = data;
 
-        for (auto it = supplyChainArr.begin(); it != supplyChainArr.end(); ++it) {
-            auto data = *it;
-            json::value dataObj = data;
+                // ensure there are no null values
+                if (dataObj[U("country")].is_null()) continue;
+                if (dataObj[U("twoWeekCorrelation")].is_null()) continue;
+                if (dataObj[U("oneMonthCorrelation")].is_null()) continue;
+                if (dataObj[U("oneYearCorrelation")].is_null()) continue;
 
-            // ensure there are no null values
-            if (dataObj[U("country")].is_null()) continue;
-            if (dataObj[U("twoWeekCorrelation")].is_null()) continue;
-            if (dataObj[U("oneMonthCorrelation")].is_null()) continue;
-            if (dataObj[U("oneYearCorrelation")].is_null()) continue;
+                string country = dataObj[U("country")].as_string();
+                float twoWkCorrelation = dataObj[U("twoWeekCorrelation")].as_double();
+                float oneMonthCorrelation = dataObj[U("oneMonthCorrelation")].as_double();
 
-            string country = dataObj[U("country")].as_string();
-            float twoWkCorrelation = dataObj[U("twoWeekCorrelation")].as_double();
-            float oneMonthCorrelation = dataObj[U("oneMonthCorrelation")].as_double();
-            float oneYrCorrelation = dataObj[U("oneYearCorrelation")].as_double();
-            bool customer = dataObj[U("customer")].as_bool();
-            bool supplier = dataObj[U("supplier")].as_bool();
-            string relatedSymbol = dataObj[U("symbol")].as_string();
+                // only look for US suppliers
+                if (country != "US") continue;
+                // look for a 75% correlation or above
+                if (oneMonthCorrelation < 0.8 && oneMonthCorrelation > -0.8) continue;
+                if (twoWkCorrelation < 0.8 && twoWkCorrelation > -0.8) continue;
 
-            // only look for US suppliers
-            if (country != "US") continue;
-            // look for a 75% correlation or above
-            if (oneMonthCorrelation < 0.8 && oneMonthCorrelation > -0.8) continue;
-            if (twoWkCorrelation < 0.8 && twoWkCorrelation > -0.8) continue;
+                SupplyChainRelations temp;
+                temp.twoWkCorrelation = twoWkCorrelation;
+                temp.oneMonthCorrelation = oneMonthCorrelation;
 
-            SupplyChainRelations* temp = new SupplyChainRelations(ticker, customer, supplier, 
-                relatedSymbol, twoWkCorrelation, oneMonthCorrelation, oneYrCorrelation);
+                temp.oneYrCorrelation = dataObj[U("oneYearCorrelation")].as_double();
+                temp.customer = dataObj[U("customer")].as_bool();
+                temp.supplier = dataObj[U("supplier")].as_bool();
+                temp.relatedSymbol = dataObj[U("symbol")].as_string();
 
-            res.push_back(temp);
+                res.push_back(temp);
+            }
         }
 
         return res;

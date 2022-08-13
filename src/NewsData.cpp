@@ -3,40 +3,34 @@
 
 namespace News
 {
-    unordered_map<string, double> newsSentiment(const string ticker) {
+    NewsSentiment newsSentiment(const string ticker) {
         string params = "/news-sentiment?symbol=" + ticker;
         json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
 
-        unordered_map<string, double> res;
+        NewsSentiment sent;
 
         json::value buzz = retVal[U("buzz")];
         json::value sentiment = retVal[U("sentiment")];
 
         if (buzz.is_null()) CPPFINANCIALDATA_ERROR("No news sent data received for ticker input: {}", ticker);
 
-        res.insert({"articlesinlastweek", buzz[U("articlesInLastWeek")].as_double()});
-        res.insert({"buzz", buzz[U("buzz")].as_double()});
-        res.insert({"weeklyaverage", buzz[U("weeklyAverage")].as_double()});
-        res.insert({"companynewsscore", retVal[U("companyNewsScore")].as_double()});
-        res.insert({"sectoravgbullishpct", retVal[U("sectorAverageBullishPercent")].as_double()});
-        res.insert({"sectoravgnewsscore", retVal[U("sectorAverageNewsScore")].as_double()});
-        res.insert({"bearsentiment", sentiment[U("bearishPercent")].as_double()});
-        res.insert({"bullsentiment", sentiment[U("bullishPercent")].as_double()});
+        sent.articlesInLastWk = buzz[U("articlesInLastWeek")].as_double();
+        sent.buzz = buzz[U("buzz")].as_double();
+        sent.weeklyAvg = buzz[U("weeklyAverage")].as_double();
+        sent.companyNewsScore = retVal[U("companyNewsScore")].as_double();
+        sent.sectorAvgBullishPct = retVal[U("sectorAverageBullishPercent")].as_double();
+        sent.sectorAvgNewsScore = retVal[U("sectorAverageNewsScore")].as_double();
+        sent.bearSentiment = sentiment[U("bearishPercent")].as_double();
+        sent.bullSentiment = sentiment[U("bullishPercent")].as_double();
 
-        return res;
+        return sent;
     }
 
-    vector<NewsArticle*> getPressReleases(const string ticker, string limit) {
-        string params;
-
-        if (limit == "") {
-            params = "/press-releases/" + ticker + "?";
-        } else {
-            params = "/press-releases/" + ticker + "?limit=" + limit + "&";
-        }
+    vector<NewsArticle> getPressReleases(const string ticker, string limit) {
+        string params = "/press-releases/" + ticker + "?limit=" + limit + "&";
         
         json::value retVal = Connect::getJson(fmpUrl, params, fmpToken);
-        vector<NewsArticle*> res;
+        vector<NewsArticle> res;
 
         if (retVal.is_null()) {
             CPPFINANCIALDATA_ERROR("No press release data for ticker input: {}", ticker);
@@ -48,11 +42,12 @@ namespace News
 
                 string date = dataObj[U("date")].as_string();
                 long unixTime = TimeConversions::convertTimeToUnix(date);
-                string title = dataObj[U("title")].as_string();
-                string text = dataObj[U("text")].as_string();
+                NewsArticle temp(unixTime);
+                temp.date = date;
 
-                NewsArticle* temp = new NewsArticle(ticker, date, unixTime, title, text);
-
+                temp.title = dataObj[U("title")].as_string();
+                temp.text = dataObj[U("text")].as_string();
+                
                 res.push_back(temp);
             }
         }
@@ -60,17 +55,11 @@ namespace News
         return res;
     }
 
-    vector<NewsArticle*> getSingleStockNews(const string ticker, string limit) {
-        string params;
-
-        if (limit == "") {
-            params = "/stock_news?tickers=" + ticker + "&";
-        } else {
-            params = "/stock_news?tickers=" + ticker + "&limit=" + limit + "&";
-        }
+    vector<NewsArticle> getSingleStockNews(const string ticker, string limit) {
+        string params = "/stock_news?tickers=" + ticker + "&limit=" + limit + "&";
         
         json::value retVal = Connect::getJson(fmpUrl, params, fmpToken);
-        vector<NewsArticle*> res;
+        vector<NewsArticle> res;
 
         if (retVal.is_null()) {
             CPPFINANCIALDATA_ERROR("No news data for ticker input: {}", ticker);
@@ -82,12 +71,12 @@ namespace News
 
                 string date = dataObj[U("publishedDate")].as_string();
                 long unixTime = TimeConversions::convertTimeToUnix(date);
-                string title = dataObj[U("title")].as_string();
-                string text = dataObj[U("text")].as_string();
-                string source = dataObj[U("site")].as_string();
+                NewsArticle temp(unixTime);
+                temp.date = date;
 
-                NewsArticle* temp = new NewsArticle(ticker, date, unixTime, title, text);
-                temp->source = source;
+                temp.title = dataObj[U("title")].as_string();
+                temp.text = dataObj[U("text")].as_string();
+                temp.source = dataObj[U("site")].as_string();
 
                 res.push_back(temp);
             }

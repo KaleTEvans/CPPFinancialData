@@ -89,40 +89,43 @@ namespace PriceData
         return ret;
     }
 
-    unordered_map<string, double> getQuote(const string ticker) {
+    Quote getQuote(const string ticker) {
         string params = "quote?symbol=" + ticker;
         json::value retVal = Connect::getJson(finnhubUrl, params, privateFinnhubToken);
 
         if (retVal.is_null() || retVal[U("c")].as_double() <= 0) CPPFINANCIALDATA_ERROR("No quote data received for ticker input: {}", ticker);
 
-        unordered_map<string, double> res;
+        Quote res;
 
         // Values
-        res.insert({"current", retVal[U("c")].as_double()});
-        res.insert({"pricechange", retVal[U("d")].as_double()});
-        res.insert({"pctchange", retVal[U("dp")].as_double()});
-        res.insert({"highofday", retVal[U("h")].as_double()});
-        res.insert({"lowofday", retVal[U("l")].as_double()});
-        res.insert({"open", retVal[U("o")].as_double()});
-        res.insert({"prevclose", retVal[U("pc")].as_double()});
+        res.current = retVal[U("c")].as_double();
+        res.priceChange = retVal[U("d")].as_double();
+        res.pctChange = retVal[U("dp")].as_double();
+        res.high = retVal[U("h")].as_double();
+        res.low = retVal[U("l")].as_double();
+        res.open = retVal[U("o")].as_double();
+        res.prevClose = retVal[U("pc")].as_double();
+        res.unixTime = retVal[U("t")].as_double();
+        res.localDate = TimeConversions::convertUnixToTime(res.unixTime);
 
         return res;
     }
 
-    unordered_map<string, double> latestBidAsk(const string ticker) {
+    BidAsk latestBidAsk(const string ticker) {
         string params = "stock/bidask?symbol=" + ticker;
         json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
 
-        unordered_map<string, double> res;
+        BidAsk res;
 
         if (retVal.is_null() || retVal[U("a")].as_double() <= 0) CPPFINANCIALDATA_ERROR("No bid/ask data received for ticker input: {}", ticker);
 
         // Values
-        res.insert({"ask", retVal[U("a")].as_double()});
-        res.insert({"askvol", retVal[U("av")].as_double()});
-        res.insert({"bid", retVal[U("b")].as_double()});
-        res.insert({"bidvol", retVal[U("bv")].as_double()});
-        res.insert({"time", retVal[U("t")].as_double() / 1000});
+        res.ask = retVal[U("a")].as_double();
+        res.askVol = retVal[U("av")].as_double();
+        res.bid = retVal[U("b")].as_double();
+        res.bidVol = retVal[U("bv")].as_double();
+        res.unixTime = retVal[U("t")].as_double() / 1000;
+        res.localDate = TimeConversions::convertUnixToTime(res.unixTime);
 
         return res;
     }

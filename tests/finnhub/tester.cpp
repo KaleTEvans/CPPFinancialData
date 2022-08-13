@@ -13,33 +13,33 @@ int main(int argc, char** argv) {
     log.Initialize();
 
     string testIn;
-    for (int i=0; i < 3; i++) testIn.push_back(argv[1][i]);
+    for (int i=0; i < 4; i++) testIn.push_back(argv[1][i]);
 
     try {
         cout << "-----------" << endl;
-        unordered_map<string, double> m1 = PriceData::getQuote(testIn);
-        cout << "Current: " << m1["current"] << endl;
-        cout << "% Change: " << m1["pctchange"] << endl;
-        cout << "Day High: " << m1["highofday"] << endl;
+        PriceData::Quote m1 = PriceData::getQuote(testIn);
+        cout << "Current: " << m1.current << endl;
+        cout << "% Change: " << m1.pctChange << endl;
+        cout << "Day High: " << m1.high << endl;
+        cout << m1.localDate << endl;
         cout << "-----------" << endl;
 
-        unordered_map<string, double> m2 = PriceData::latestBidAsk(testIn);
-        cout << "ask: " << m2["ask"] << endl;
-        cout << "askVol: " << m2["askvol"] << endl;
-        cout << "bidVol: " << m2["bidvol"] << endl;
-        cout << "Unix: " << m2["time"] << endl;
-        cout << "Time: " << TimeConversions::convertUnixToTime(m2["time"]) << endl;
+        PriceData::BidAsk m2 = PriceData::latestBidAsk(testIn);
+        cout << "ask: " << m2.ask<< endl;
+        cout << "askVol: " << m2.askVol << endl;
+        cout << "bidVol: " << m2.bid << endl;
+        cout << m2.localDate << endl;
         cout << "-----------" << endl;
 
-        unordered_map<string, double> m3 = News::newsSentiment(testIn);
-        cout << "articlesinlastweek: " << m3["articlesinlastweek"] << endl;
-        cout << "buzz: " << m3["buzz"] << endl;
-        cout << "weeklyaverage: " << m3["weeklyaverage"] << endl;
-        cout << "companynewsscore: " << m3["companynewsscore"] << endl;
-        cout << "sectoravgbullishpct: " << m3["sectoravgbullishpct"] << endl;
-        cout << "sectoravgnewsscore: " << m3["sectoravgnewsscore"] << endl;
-        cout << "bearsentiment: " << m3["bearsentiment"] << endl;
-        cout << "bullsentiment: " << m3["bullsentiment"] << endl;
+        News::NewsSentiment m3 = News::newsSentiment(testIn);
+        cout << "articlesinlastweek: " << m3.articlesInLastWk << endl;
+        cout << "buzz: " << m3.buzz << endl;
+        cout << "weeklyaverage: " << m3.weeklyAvg << endl;
+        cout << "companynewsscore: " << m3.companyNewsScore << endl;
+        cout << "sectoravgbullishpct: " << m3.sectorAvgBullishPct << endl;
+        cout << "sectoravgnewsscore: " << m3.sectorAvgNewsScore << endl;
+        cout << "bearsentiment: " << m3.bullSentiment << endl;
+        cout << "bullsentiment: " << m3.bearSentiment << endl;
         cout << "-----------" << endl;
         
         // json::value res = Fundamentals::getFinancialData(testIn);
@@ -48,28 +48,28 @@ int main(int argc, char** argv) {
         // cout << "eps annual ttm: " << js[U("epsBasicExclExtraItemsTTM")].as_double() << endl;
         // cout << "-----------" << endl;
 
-        // unordered_map<string, double> map = Fundamentals::earningsUpcoming(testIn);
-        // cout << "date " << TimeConversions::convertUnixToDate(map["unixTime"]) << endl;
-        // cout << "epsestimate " << map["epsestimate"] << endl;
-        // cout << "quarter " << map["quarter"] << endl;
-        // cout << "-----------" << endl;
+        Fundamentals::Earnings upcoming = Fundamentals::earningsUpcoming(testIn);
+        cout << "date " << upcoming.date << endl;
+        cout << "epsestimate " << upcoming.epsEstimate << endl;
+        cout << "quarter " << upcoming.quarter << endl;
+        cout << "-----------" << endl;
 
-        // vector<Fundamentals::SupplyChainRelations*> supply = Fundamentals::supplyChainData(testIn);
-        // for (auto k : supply) {
-        //     cout << "related: " << k->relatedSymbol << endl;
-        //     cout << "2Wk Correlation: " << k->twoWkCorrelation << endl;
-        //     cout << "1Mo Corr: " << k->oneMonthCorrelation << endl;
-        //     cout << "1Yr corr: " << k->oneYrCorrelation << endl; 
-        // }
-        // cout << "-----------" << endl;
+        vector<Fundamentals::SupplyChainRelations> supply = Fundamentals::supplyChainData(testIn);
+        for (auto k : supply) {
+            cout << "related: " << k.relatedSymbol << endl;
+            cout << "2Wk Correlation: " << k.twoWkCorrelation << endl;
+            cout << "1Mo Corr: " << k.oneMonthCorrelation << endl;
+            cout << "1Yr corr: " << k.oneYrCorrelation << endl; 
+        }
+        cout << "-----------" << endl;
 
-        vector<TechnicalData::ChartPatternData*> tech = TechnicalData::getChartPatterns(testIn, "60");
+        vector<TechnicalData::ChartPatternData> tech = TechnicalData::getChartPatterns(testIn, "60");
         for (auto i : tech) {
-            cout << i->patternName << endl;
-            cout << i->patternType << endl;
-            cout << i->status << endl;
-            for (int j=0; j < i->pricePoints.size(); j++) {
-                cout << i->pricePoints[j].first << ": " << i->pricePoints[j].second << " " << TimeConversions::convertUnixToTime(i->timePoints[j]) << endl;
+            cout << i.patternName << endl;
+            cout << i.patternType << endl;
+            cout << i.status << endl;
+            for (int j=0; j < i.pricePoints.size(); j++) {
+                cout << i.pricePoints[j].first << ": " << i.pricePoints[j].second << " " << TimeConversions::convertUnixToTime(i.timePoints[j]) << endl;
             }
         }
         cout << "-----------" << endl;
