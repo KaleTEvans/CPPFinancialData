@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
     log.Initialize();
 
     string testIn;
-    for (int i=0; i < 4; i++) testIn.push_back(argv[1][i]);
+    for (int i=0; i < 3; i++) testIn.push_back(argv[1][i]);
 
     try {
         cout << "-----------" << endl;
@@ -42,26 +42,26 @@ int main(int argc, char** argv) {
         cout << "bullsentiment: " << m3["bullsentiment"] << endl;
         cout << "-----------" << endl;
         
-        json::value res = Fundamentals::getFinancialData(testIn);
-        json::value js = res[U("metric")];
-        cout << "10 day avg vol : " << js[U("10DayAverageTradingVolume")].as_double() << endl;
-        cout << "eps annual ttm: " << js[U("epsBasicExclExtraItemsTTM")].as_double() << endl;
-        cout << "-----------" << endl;
+        // json::value res = Fundamentals::getFinancialData(testIn);
+        // json::value js = res[U("metric")];
+        // cout << "10 day avg vol : " << js[U("10DayAverageTradingVolume")].as_double() << endl;
+        // cout << "eps annual ttm: " << js[U("epsBasicExclExtraItemsTTM")].as_double() << endl;
+        // cout << "-----------" << endl;
 
-        unordered_map<string, double> map = Fundamentals::earningsUpcoming(testIn);
-        cout << "date " << TimeConversions::convertUnixToDate(map["unixTime"]) << endl;
-        cout << "epsestimate " << map["epsestimate"] << endl;
-        cout << "quarter " << map["quarter"] << endl;
-        cout << "-----------" << endl;
+        // unordered_map<string, double> map = Fundamentals::earningsUpcoming(testIn);
+        // cout << "date " << TimeConversions::convertUnixToDate(map["unixTime"]) << endl;
+        // cout << "epsestimate " << map["epsestimate"] << endl;
+        // cout << "quarter " << map["quarter"] << endl;
+        // cout << "-----------" << endl;
 
-        vector<Fundamentals::SupplyChainRelations*> supply = Fundamentals::supplyChainData(testIn);
-        for (auto k : supply) {
-            cout << "related: " << k->relatedSymbol << endl;
-            cout << "2Wk Correlation: " << k->twoWkCorrelation << endl;
-            cout << "1Mo Corr: " << k->oneMonthCorrelation << endl;
-            cout << "1Yr corr: " << k->oneYrCorrelation << endl; 
-        }
-        cout << "-----------" << endl;
+        // vector<Fundamentals::SupplyChainRelations*> supply = Fundamentals::supplyChainData(testIn);
+        // for (auto k : supply) {
+        //     cout << "related: " << k->relatedSymbol << endl;
+        //     cout << "2Wk Correlation: " << k->twoWkCorrelation << endl;
+        //     cout << "1Mo Corr: " << k->oneMonthCorrelation << endl;
+        //     cout << "1Yr corr: " << k->oneYrCorrelation << endl; 
+        // }
+        // cout << "-----------" << endl;
 
         vector<TechnicalData::ChartPatternData*> tech = TechnicalData::getChartPatterns(testIn, "60");
         for (auto i : tech) {
@@ -80,7 +80,10 @@ int main(int argc, char** argv) {
         // sleep(5);
         // delete f;
 
-        //TechnicalData::getSupportAndResistance(testIn, "15");
+        vector<double> tempV = TechnicalData::getSupportAndResistance(testIn, "60");
+        for (auto i : tempV) cout << i << endl;
+        cout << "-----------" << endl;
+
         TechnicalData::AggregateData agg(TechnicalData::getAggregateIndicators(testIn, "D"));
         cout << "signal " << agg.signal << endl;
         cout << "adx " << agg.adx << endl;

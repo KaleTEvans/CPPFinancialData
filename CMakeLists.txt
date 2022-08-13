@@ -47,7 +47,7 @@ install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 install(FILES "${PROJECT_BINARY_DIR}/FinancialDataConfig.h" DESTINATION include)
 
 # test logic
-option(TEST_FINNHUB "Test library for finnhub endpoints" ON)
+option(TEST_FINNHUB "Test library for finnhub endpoints" OFF)
 option(TEST_FMP "Test library for fmp endpoints" ON)
 
 configure_file(FinancialDataConfig.h.in FinancialDataConfig.h)

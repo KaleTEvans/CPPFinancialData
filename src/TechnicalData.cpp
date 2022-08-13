@@ -12,17 +12,18 @@ namespace TechnicalData
 
         auto chartPatternArray = retVal[U("points")].as_array();
 
-        if (chartPatternArray[0][U("status")].is_null()) 
+        if (chartPatternArray[0][U("status")].is_null()) {
             CPPFINANCIALDATA_WARN("There is no pattern data for {} at the {} resolution", ticker, resolution);
+        } else {
+            for (auto it = chartPatternArray.begin(); it != chartPatternArray.end(); ++it) {
+                auto data = *it;
+                json::value dataObj = data;
 
-        for (auto it = chartPatternArray.begin(); it != chartPatternArray.end(); ++it) {
-            auto data = *it;
-            json::value dataObj = data;
+                if (data[U("patterntype")].as_string() == "unknown") continue;
+                ChartPatternData* temp = new ChartPatternData(data, ticker, resolution);
 
-            if (data[U("patterntype")].as_string() == "unknown") continue;
-            ChartPatternData* temp = new ChartPatternData(data, ticker, resolution);
-
-            res.push_back(temp);
+                res.push_back(temp);
+            }
         }
 
         return res;
@@ -34,15 +35,17 @@ namespace TechnicalData
         
         vector<double> res;
 
-        if (retVal[U("levels")].is_null()) CPPFINANCIALDATA_WARN("There is no support/resistance data for {}", ticker);
+        if (retVal[U("levels")].is_null()) {
+            CPPFINANCIALDATA_WARN("There is no support/resistance data for {}", ticker);
+        } else {
+            auto levelData = retVal[U("levels")].as_array();
 
-        auto levelData = retVal[U("levels")].as_array();
+            for (auto it = levelData.begin(); it != levelData.end(); ++it) {
+                auto data = *it;
+                json::value dataObj = data;
 
-        for (auto it = levelData.begin(); it != levelData.end(); ++it) {
-            auto data = *it;
-            json::value dataObj = data;
-
-            res.push_back(dataObj.as_double());
+                res.push_back(dataObj.as_double());
+            }
         }
 
         return res;
