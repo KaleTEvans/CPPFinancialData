@@ -27,7 +27,7 @@ namespace Connect
         try {
             requestJson.wait();
         } catch (const std::exception &e) {
-            printf("Error exception:%s\n", e.what());
+            CPPFINANCIALDATA_FATAL("Error making request: {}", e.what());
         }
 
         return retVal;

@@ -197,4 +197,41 @@ namespace Fundamentals
 
         return res;
     }
+
+    CompanyProfile getCompanyProfile(const string ticker) {
+        string params1 = "/profile/" + ticker + "?";
+        string params2 = "/stock_peers?symbol=" + ticker + "&";
+        json::value retVal1 = Connect::getJson(fmpUrl, params1, fmpToken);
+        json::value retVal2 = Connect::getJson("https://financialmodelingprep.com/api/v4", params2, fmpToken);
+
+        CompanyProfile res;
+        res.symbol = ticker;
+
+        if (retVal1.as_array().size() < 1) CPPFINANCIALDATA_ERROR("No financial data available for {}", ticker);
+        if (retVal2.as_array().size() < 1) {
+            CPPFINANCIALDATA_WARN("No peers data for {}", ticker);
+        } else {
+            auto tempArr1 = retVal1.as_array();
+            auto tempArr2 = retVal2.as_array();
+            tempArr2 = tempArr2[0][U("peersList")].as_array();
+            vector<string> peers;
+
+            res.beta = tempArr1[0][U("beta")].as_double();
+            res.volAvg = tempArr1[0][U("volAvg")].as_double();
+            res.marketCap = tempArr1[0][U("mktCap")].as_double();
+            res.cik = tempArr1[0][U("cik")].as_string();
+            res.isin = tempArr1[0][U("isin")].as_string();
+            res.exchange = tempArr1[0][U("exchange")].as_string();
+            res.industry = tempArr1[0][U("industry")].as_string();
+            res.sector = tempArr1[0][U("sector")].as_string();
+
+            for (auto i : tempArr2) {
+                peers.push_back(i.as_string());
+            }
+
+            res.peers = peers;
+        }
+
+        return res;
+    }
 }

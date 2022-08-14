@@ -41,7 +41,17 @@ namespace Fundamentals
     };
 
     class CompanyProfile {
-        
+        public:
+            string symbol;
+            double beta;
+            double volAvg;
+            double marketCap;
+            string cik;
+            string isin;
+            string exchange;
+            string industry;
+            string sector;
+            vector<string> peers;
     };
 
     json::value getFinancialData(const string ticker, string metric = "");
@@ -50,6 +60,7 @@ namespace Fundamentals
     vector<SupplyChainRelations> supplyChainData(const string ticker);
     FinancialScores getFinancialScores(const string ticker);
     vector<FinancialScores> getQuarterlyFinancialScores(const string ticker, string limit = "1");
+    CompanyProfile getCompanyProfile(const string ticker);
 }
 
 #endif // FUNDAMENTALDATA_H
