@@ -1,34 +1,8 @@
 #include "FinancialData/TechnicalData.h"
-#include "FinancialData/TimeConversions.h"
 #include "Keys.h"
 
 namespace TechnicalData
 {
-    vector<ChartPatternData> getChartPatterns(const string ticker, string resolution) {
-        string params = "/scan/pattern?symbol=" + ticker + "&resolution=" + resolution;
-        json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
-
-        vector<ChartPatternData> res;
-
-        auto chartPatternArray = retVal[U("points")].as_array();
-
-        if (chartPatternArray[0][U("status")].is_null()) {
-            CPPFINANCIALDATA_WARN("There is no pattern data for {} at the {} resolution", ticker, resolution);
-        } else {
-            for (auto it = chartPatternArray.begin(); it != chartPatternArray.end(); ++it) {
-                auto data = *it;
-                json::value dataObj = data;
-
-                if (data[U("patterntype")].as_string() == "unknown") continue;
-                ChartPatternData temp(data, ticker, resolution);
-
-                res.push_back(temp);
-            }
-        }
-
-        return res;
-    }
-
     vector<double> getSupportAndResistance(const string ticker, string resolution) {
         string params = "/scan/support-resistance?symbol=" + ticker + "&resolution=" + resolution;
         json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
@@ -57,11 +31,12 @@ namespace TechnicalData
 
         if (retVal.at("technicalAnalysis").at("signal").is_null()) CPPFINANCIALDATA_WARN("There is no aggregate data for {}", ticker);
 
-        string signal = retVal.at("technicalAnalysis").at("signal").as_string();
-        double adx = retVal.at("trend").at("adx").as_double();
-        bool trending = retVal.at("trend").at("trending").as_bool();
+        AggregateData res;
+        res.ticker = ticker;
+        res.signal = retVal.at("technicalAnalysis").at("signal").as_string();
+        res.adx = retVal.at("trend").at("adx").as_double();
+        res.trending = retVal.at("trend").at("trending").as_bool();
 
-        AggregateData res(signal, adx, trending);
         return res;
     }
 }

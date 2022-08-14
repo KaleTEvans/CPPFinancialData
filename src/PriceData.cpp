@@ -106,7 +106,7 @@ namespace PriceData
         res.open = retVal[U("o")].as_double();
         res.prevClose = retVal[U("pc")].as_double();
         res.unixTime = retVal[U("t")].as_double();
-        res.localDate = TimeConversions::convertUnixToTime(res.unixTime);
+        res.localDate = TimeConversions::convertUnixToDateTime(res.unixTime);
 
         return res;
     }
@@ -125,7 +125,7 @@ namespace PriceData
         res.bid = retVal[U("b")].as_double();
         res.bidVol = retVal[U("bv")].as_double();
         res.unixTime = retVal[U("t")].as_double() / 1000;
-        res.localDate = TimeConversions::convertUnixToTime(res.unixTime);
+        res.localDate = TimeConversions::convertUnixToDateTime(res.unixTime);
 
         return res;
     }

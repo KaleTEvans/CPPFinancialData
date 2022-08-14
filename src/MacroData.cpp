@@ -39,4 +39,38 @@ namespace MacroData
 
         return res;
     }
+
+    vector<TreasuryRates> getTreasuryRates(string from, string to) {
+        if (to == "") to = TimeConversions::getCurrentDate();
+
+        string params = "/treasury?from=" + from + "&to=" + to + "&";
+        json::value retVal = Connect::getJson("https://financialmodelingprep.com/api/v4", params, fmpToken);
+
+        if (retVal.as_array().size() < 1) CPPFINANCIALDATA_ERROR("No treasury yield data received");
+
+        vector<TreasuryRates> res;
+        auto jsonArr = retVal.as_array();
+        for (auto it = jsonArr.begin(); it != jsonArr.end(); ++it) {
+            auto data = *it;
+            json::value dataObj = data;
+            TreasuryRates temp;
+
+            temp.date = dataObj[U("date")].as_string();
+            temp.unixDate = TimeConversions::convertTimeToUnix(temp.date);
+            temp.oneMonth = dataObj[U("month1")].as_double();
+            temp.twoMonth = dataObj[U("month2")].as_double();
+            temp.threeMonth = dataObj[U("month3")].as_double();
+            temp.oneYear = dataObj[U("year1")].as_double();
+            temp.twoYear = dataObj[U("year2")].as_double();
+            temp.fiveYear = dataObj[U("year5")].as_double();
+            temp.sevenYear = dataObj[U("year7")].as_double();
+            temp.tenYear = dataObj[U("year10")].as_double();
+            temp.twentyYear = dataObj[U("year20")].as_double();
+            temp.thirtyYear = dataObj[U("year30")].as_double();
+
+            res.push_back(temp);
+        }
+
+        return res;
+    }
 }

@@ -1,7 +1,8 @@
 #include "FinancialData/MarketPerformance.h"
-#include "FinancialData/TimeConversions.h"
 #include "FinancialData/Logger.h"
 #include "Keys.h"
+
+#include <unordered_map>
 
 namespace MarketData
 {
@@ -36,7 +37,7 @@ namespace MarketData
         string params = "/historical-sectors-performance?limit=" + limit + "&";
         json::value retVal = Connect::getJson(fmpUrl, params, fmpToken);
 
-        unordered_map<string, string> map;
+        std::unordered_map<string, string> map;
         map["Utilities"] = "utilitiesChangesPercentage";
         map["Basic Materials"] = "basicMaterialsChangesPercentage";
         map["Communication Services"] = "communicationServicesChangesPercentage";
@@ -99,4 +100,29 @@ namespace MarketData
 
         return res;
     }
+
+    vector<NotableStock> getMostActiveStocks() {
+        string params = "/stock_market/actives?";
+        json::value retVal = Connect::getJson(fmpUrl, params, fmpToken);
+
+        if (retVal.as_array().size() < 1) CPPFINANCIALDATA_FATAL("Unabale to get most active list, check api connection");
+
+        vector<NotableStock> res;
+        auto jsonArr = retVal.as_array();
+        for (auto it = jsonArr.begin(); it != jsonArr.end(); ++it) {
+            auto data = *it;
+            json::value dataObj = data;
+            NotableStock stock;
+
+            stock.symbol = dataObj[U("symbol")].as_string();
+            stock.name = dataObj[U("name")].as_string();
+            stock.priceChange = dataObj[U("change")].as_double();
+            stock.price = dataObj[U("price")].as_double();
+            stock.changePct = dataObj[U("changesPercentage")].as_double();
+
+            res.push_back(stock);
+        }
+
+        return res;
+    } 
 }

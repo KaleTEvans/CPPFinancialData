@@ -41,9 +41,11 @@ namespace News
                 json::value dataObj = data;
 
                 string date = dataObj[U("date")].as_string();
-                long unixTime = TimeConversions::convertTimeToUnix(date);
-                NewsArticle temp(unixTime);
+                NewsArticle temp;
+
+                temp.unixDate = TimeConversions::convertTimeToUnix(date);
                 temp.date = date;
+                temp.localDate = TimeConversions::convertUnixToDateTime(temp.unixDate);
 
                 temp.title = dataObj[U("title")].as_string();
                 temp.text = dataObj[U("text")].as_string();
@@ -70,9 +72,11 @@ namespace News
                 json::value dataObj = data;
 
                 string date = dataObj[U("publishedDate")].as_string();
-                long unixTime = TimeConversions::convertTimeToUnix(date);
-                NewsArticle temp(unixTime);
+                NewsArticle temp;
+
                 temp.date = date;
+                temp.unixDate = TimeConversions::convertTimeToUnix(date);
+                temp.localDate = TimeConversions::convertUnixToDateTime(temp.unixDate);
 
                 temp.title = dataObj[U("title")].as_string();
                 temp.text = dataObj[U("text")].as_string();

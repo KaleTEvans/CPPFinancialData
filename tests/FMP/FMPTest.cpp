@@ -1,3 +1,7 @@
+#define CPPFINANCIALDATA_ACTIVE_LEVEL CPPFINANCIALDATA_LEVEL_TRACE
+#define CPPFINANCIALDATA_DEBUG_ON
+#define CPPFINANCIALDATA_TRACE_ON
+
 #include "FinancialData/NewsData.h"
 #include "FinancialData/FundamentalData.h"
 #include "FinancialData/TimeConversions.h"
@@ -94,9 +98,33 @@ int main(int argc, char** argv) {
             cout << i.sector << ": " << i.changePct << endl;
         }
         cout << "----------" << endl;
+
+        // vector<MarketData::NotableStock> m8 = MarketData::getMostActiveStocks();
+        // for (auto i : m8) {
+        //     cout << i.symbol << ": " << i.priceChange << endl;
+        // }
+
+        vector<Fundamentals::InsiderTrade> m9 = Fundamentals::getCompanyInsiderTrades(testIn);
+        for (int i=0; i < 2; i++) {
+            cout << m9[i].filingDate << ": " << m9[i].filingDateUnix << endl;
+            cout << m9[i].transactionDate << ": " << m9[i].txnDateUnix << endl;
+            cout << m9[i].transactionType << ": " << m9[i].isSale << endl;
+            cout << m9[i].totalTransaction << endl;
+            cout << "----------" << endl;
+        }
+
+        // vector<MacroData::TreasuryRates> test = MacroData::getTreasuryRates("2022-08-12");
+        // for (auto i : test) {
+        //     cout << i.date << ": " << i.unixDate << endl;
+        //     cout << i.oneMonth << endl;
+        //     cout << "5 " << i.fiveYear << endl;
+        //     cout << "2m" << i.twoMonth << endl;
+        //     cout << "2y" << i.twoYear << endl;
+        //     cout << "20y " << i.twentyYear << endl;
+        // }   
     } 
     catch (web::json::json_exception& e) {
-        CPPFINANCIALDATA_ERROR("Error: {}", e.what());
+        CPPFINANCIALDATA_TRACE("Error: {}", e.what());
     }
 
     log.Shutdown();

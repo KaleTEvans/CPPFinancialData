@@ -1,10 +1,6 @@
 #ifndef FORMATREQUEST_H
 #define FORMATREQUEST_H
 
-#include <iostream>
-#include <ctime>
-#include <unordered_map>
-#include <vector>
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
 #include <cpprest/uri.h>
@@ -12,6 +8,7 @@
 #include <cpprest/ws_client.h>
 
 #include "Logger.h"
+#include "TimeConversions.h"
 
 using namespace utility;
 using namespace web;
@@ -23,7 +20,6 @@ using namespace web::http;
 using namespace web::http::client;
 
 using std::string;
-using std::unordered_map;
 using std::vector;
 
 namespace Connect 

@@ -1,6 +1,5 @@
 #include "FinancialData/FundamentalData.h"
 #include "FinancialData/FormatRequest.h"
-#include "FinancialData/TimeConversions.h"
 #include "Keys.h"
 
 namespace Fundamentals
@@ -207,10 +206,10 @@ namespace Fundamentals
         CompanyProfile res;
         res.symbol = ticker;
 
-        if (retVal1.as_array().size() < 1) CPPFINANCIALDATA_ERROR("No financial data available for {}", ticker);
+        if (retVal1.as_array().size() < 1) CPPFINANCIALDATA_TRACE("No financial data available for {}", ticker);
         if (retVal2.as_array().size() < 1) {
             CPPFINANCIALDATA_WARN("No peers data for {}", ticker);
-        } else {
+        } 
             auto tempArr1 = retVal1.as_array();
             auto tempArr2 = retVal2.as_array();
             tempArr2 = tempArr2[0][U("peersList")].as_array();
@@ -230,6 +229,39 @@ namespace Fundamentals
             }
 
             res.peers = peers;
+
+
+        return res;
+    }
+
+    vector<InsiderTrade> getCompanyInsiderTrades(const string ticker, string limit) {
+        string params = "/insider-trading?symbol=" + ticker + "&limit=" + limit + "&";
+        json::value retVal = Connect::getJson("https://financialmodelingprep.com/api/v4", params, fmpToken);
+
+        vector<InsiderTrade> res;
+
+        if (retVal.as_array().size() < 1) {
+            CPPFINANCIALDATA_WARN("No insider trade data available for {}", ticker);
+        } else {
+            auto jsonArr = retVal.as_array();
+            for (auto it = jsonArr.begin(); it != jsonArr.end(); ++it) {
+                auto data = *it;
+                json::value dataObj = data;
+                InsiderTrade temp;
+
+                temp.symbol = ticker;
+                temp.filingDate = dataObj[U("filingDate")].as_string();
+                temp.filingDateUnix = TimeConversions::convertTimeToUnix(temp.filingDate);
+                temp.transactionDate = dataObj[U("transactionDate")].as_string();
+                temp.txnDateUnix = TimeConversions::convertTimeToUnix(temp.transactionDate);
+                temp.transactionType = dataObj[U("transactionType")].as_string();
+                if (temp.transactionType == "S-Sale") temp.isSale = true;
+                temp.securitiesTransacted = dataObj[U("securitiesTransacted")].as_double();
+                temp.price = dataObj[U("price")].as_double();
+                temp.totalTransaction = temp.securitiesTransacted * temp.price;
+
+                res.push_back(temp);
+            }
         }
 
         return res;

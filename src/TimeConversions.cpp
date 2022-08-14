@@ -28,7 +28,7 @@ namespace TimeConversions
         return time_buf;
     }
 
-    string convertUnixToTime(time_t date) {
+    string convertUnixToDateTime(time_t date) {
         char time_buf[80];
         struct tm ts;
         ts = *localtime(&date);
@@ -62,5 +62,10 @@ namespace TimeConversions
 
         string result = dates[dow];
         return result;
+    }
+
+    string getCurrentDate() {
+        time_t now = time(0);
+        return convertUnixToDate(now);
     }
 }
