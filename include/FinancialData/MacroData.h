@@ -19,21 +19,9 @@ namespace MacroData
             string impact;
     };
 
-    class Sector {
-        public:
-            string date = "";
-            string sector;
-            double peRatio = 0;
-            double changePct = 0;
-    };
-
     // No date inputs only gives future economic events
     vector<EconomicEvent> getEconomicCalendar(string from = "", string to = "");
-    // This data can only be retrieved on a daily basis
-    vector<Sector> getSingleSectorMetrics(const string date);
-    vector<Sector> getHistoricalSectorPctChange(const string sector, string limit = "1");
-    // Updated Hourly
-    vector<Sector> getCurrentSectorChange();
+    
 }
 
 #endif // MACRODATA_H

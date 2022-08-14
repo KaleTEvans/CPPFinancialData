@@ -2,6 +2,7 @@
 #include "FinancialData/FundamentalData.h"
 #include "FinancialData/TimeConversions.h"
 #include "FinancialData/MacroData.h"
+#include "FinancialData/MarketPerformance.h"
 #include "FinancialData/Logger.h"
 
 int main(int argc, char** argv) {
@@ -76,22 +77,23 @@ int main(int argc, char** argv) {
         }
         cout << "----------" << endl;
 
-        vector<MacroData::Sector> m5 = MacroData::getSingleSectorMetrics("2022-08-12");
-        for (auto i : m5) {
-            cout << i.sector << ": " << i.peRatio << endl;
-        }
-        cout << "----------" << endl;
+        // vector<MarketData::Sector> m5 = MarketData::getSingleSectorMetrics("2022-08-12");
+        // for (auto i : m5) {
+        //     cout << i.sector << ": " << i.peRatio << endl;
+        // }
+        // cout << "----------" << endl;
 
-        vector<MacroData::Sector> m6 = MacroData::getHistoricalSectorPctChange("Technology", "2");
+        vector<MarketData::Sector> m6 = MarketData::getHistoricalSectorPctChange("Technology", "2");
         for (auto i : m6) {
             cout << i.date << ": " << i.changePct << endl;
         }
         cout << "----------" << endl;
 
-        vector<MacroData::Sector> m7 = MacroData::getCurrentSectorChange();
+        vector<MarketData::Sector> m7 = MarketData::getCurrentSectorChange();
         for (auto i : m7) {
             cout << i.sector << ": " << i.changePct << endl;
         }
+        cout << "----------" << endl;
     } 
     catch (web::json::json_exception& e) {
         CPPFINANCIALDATA_ERROR("Error: {}", e.what());
