@@ -1,6 +1,4 @@
 #include "FinancialData/MacroData.h"
-#include "FinancialData/TimeConversions.h"
-#include "FinancialData/Logger.h"
 #include "Keys.h"
 
 namespace MacroData
@@ -9,7 +7,10 @@ namespace MacroData
         string params = "/economic_calendar?from=" + from + "&to=" + to + "&";
         json::value retVal = Connect::getJson(fmpUrl, params, fmpToken);
 
-        if (retVal.is_null()) CPPFINANCIALDATA_ERROR("No economic data found");
+        if (retVal.as_array().size() < 1) {
+            CPPFINANCIALDATA_WARN("No data received");
+            throw json::json_exception("No data");
+        }
 
         auto dataArr = retVal.as_array();
         vector<EconomicEvent> res;
@@ -46,7 +47,10 @@ namespace MacroData
         string params = "/treasury?from=" + from + "&to=" + to + "&";
         json::value retVal = Connect::getJson("https://financialmodelingprep.com/api/v4", params, fmpToken);
 
-        if (retVal.as_array().size() < 1) CPPFINANCIALDATA_ERROR("No treasury yield data received");
+        if (retVal.as_array().size() < 1) {
+            CPPFINANCIALDATA_WARN("No data received");
+            throw json::json_exception("No data");
+        }
 
         vector<TreasuryRates> res;
         auto jsonArr = retVal.as_array();

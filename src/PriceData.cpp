@@ -1,5 +1,4 @@
 #include "FinancialData/PriceData.h"
-#include "FinancialData/TimeConversions.h"
 #include "Keys.h"
 
 namespace PriceData 
@@ -80,7 +79,7 @@ namespace PriceData
             client.close().wait();
         }
         catch (std::error_code& code) {
-            std::cout << "ERROR: " << code << std::endl;
+            CPPFINANCIALDATA_ERROR(code);
         }
     }
 
@@ -93,7 +92,10 @@ namespace PriceData
         string params = "quote?symbol=" + ticker;
         json::value retVal = Connect::getJson(finnhubUrl, params, privateFinnhubToken);
 
-        if (retVal.is_null() || retVal[U("c")].as_double() <= 0) CPPFINANCIALDATA_ERROR("No quote data received for ticker input: {}", ticker);
+        if (retVal.is_null() || retVal[U("c")].as_double() <= 0) {
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
+            throw json::json_exception("No data");
+        }
 
         Quote res;
 
@@ -117,7 +119,10 @@ namespace PriceData
 
         BidAsk res;
 
-        if (retVal.is_null() || retVal[U("a")].as_double() <= 0) CPPFINANCIALDATA_ERROR("No bid/ask data received for ticker input: {}", ticker);
+        if (retVal.is_null() || retVal[U("a")].as_double() <= 0) {
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
+            throw json::json_exception("No data");
+        }
 
         // Values
         res.ask = retVal[U("a")].as_double();

@@ -12,7 +12,10 @@ namespace News
         json::value buzz = retVal[U("buzz")];
         json::value sentiment = retVal[U("sentiment")];
 
-        if (buzz.is_null()) CPPFINANCIALDATA_ERROR("No news sent data received for ticker input: {}", ticker);
+        if (buzz.is_null()) {
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
+            throw json::json_exception("No data");
+        }
 
         sent.articlesInLastWk = buzz[U("articlesInLastWeek")].as_double();
         sent.buzz = buzz[U("buzz")].as_double();
@@ -33,7 +36,7 @@ namespace News
         vector<NewsArticle> res;
 
         if (retVal.is_null()) {
-            CPPFINANCIALDATA_ERROR("No press release data for ticker input: {}", ticker);
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
         } else {
             auto jsonArr = retVal.as_array();
             for (auto it = jsonArr.begin(); it != jsonArr.end(); ++it) {
@@ -64,7 +67,7 @@ namespace News
         vector<NewsArticle> res;
 
         if (retVal.is_null()) {
-            CPPFINANCIALDATA_ERROR("No news data for ticker input: {}", ticker);
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
         } else {
             auto jsonArr = retVal.as_array();
             for (auto it = jsonArr.begin(); it != jsonArr.end(); ++it) {

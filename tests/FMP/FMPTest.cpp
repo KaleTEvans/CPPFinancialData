@@ -1,7 +1,3 @@
-#define CPPFINANCIALDATA_ACTIVE_LEVEL CPPFINANCIALDATA_LEVEL_TRACE
-#define CPPFINANCIALDATA_DEBUG_ON
-#define CPPFINANCIALDATA_TRACE_ON
-
 #include "FinancialData/NewsData.h"
 #include "FinancialData/FundamentalData.h"
 #include "FinancialData/TimeConversions.h"
@@ -60,7 +56,7 @@ int main(int argc, char** argv) {
             cout << "----------" << endl;
         }
 
-        vector<MacroData::EconomicEvent> m3 = MacroData::getEconomicCalendar("2022-07-01", "2022-08-01");
+        vector<MacroData::EconomicEvent> m3 = MacroData::getEconomicCalendar("2013-07-01", "2014-08-01");
         for (int i=0; i < 2; i++) {
             cout << "event: " << m3[i].event << endl;
             cout << "date: " << m3[i].date << endl;
@@ -104,7 +100,7 @@ int main(int argc, char** argv) {
         //     cout << i.symbol << ": " << i.priceChange << endl;
         // }
 
-        vector<Fundamentals::InsiderTrade> m9 = Fundamentals::getCompanyInsiderTrades(testIn);
+        vector<Fundamentals::InsiderTrade> m9 = Fundamentals::getCompanyInsiderTrades("AAPL");
         for (int i=0; i < 2; i++) {
             cout << m9[i].filingDate << ": " << m9[i].filingDateUnix << endl;
             cout << m9[i].transactionDate << ": " << m9[i].txnDateUnix << endl;
@@ -124,7 +120,7 @@ int main(int argc, char** argv) {
         // }   
     } 
     catch (web::json::json_exception& e) {
-        CPPFINANCIALDATA_TRACE("Error: {}", e.what());
+        CPPFINANCIALDATA_ERROR(e.what());
     }
 
     log.Shutdown();

@@ -10,7 +10,7 @@ namespace TechnicalData
         vector<double> res;
 
         if (retVal[U("levels")].is_null()) {
-            CPPFINANCIALDATA_WARN("There is no support/resistance data for {}", ticker);
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
         } else {
             auto levelData = retVal[U("levels")].as_array();
 
@@ -29,7 +29,10 @@ namespace TechnicalData
         string params = "/scan/technical-indicator?symbol=" + ticker + "&resolution=" + resoluition;
         json::value retVal = Connect::getJson(finnhubUrl, params, finnhubToken);
 
-        if (retVal.at("technicalAnalysis").at("signal").is_null()) CPPFINANCIALDATA_WARN("There is no aggregate data for {}", ticker);
+        if (retVal.at("technicalAnalysis").at("signal").is_null()) {
+            CPPFINANCIALDATA_WARN("No data available for: {}", ticker);
+            throw json::json_exception("No data");
+        }
 
         AggregateData res;
         res.ticker = ticker;

@@ -1,5 +1,4 @@
 #include "FinancialData/MarketPerformance.h"
-#include "FinancialData/Logger.h"
 #include "Keys.h"
 
 #include <unordered_map>
@@ -13,7 +12,7 @@ namespace MarketData
         vector<Sector> res;
 
         if (retVal.as_array().size() < 1) {
-            CPPFINANCIALDATA_ERROR("Could not retrieve sector p/e data for {}", date);
+            CPPFINANCIALDATA_WARN("No data received for: {}", date);
         } else {
             auto arr = retVal.as_array();
             for (auto it = arr.begin(); it != arr.end(); ++it) {
@@ -52,7 +51,7 @@ namespace MarketData
 
         vector<Sector> res;
         if (retVal.as_array().size() < 1) {
-            CPPFINANCIALDATA_ERROR("No historical sector data for this limit: {}", limit);
+            CPPFINANCIALDATA_WARN("No data received for: {}", limit);
         } else {
             auto arr = retVal.as_array();
             for (auto it = arr.begin(); it != arr.end(); ++it) {
@@ -78,7 +77,7 @@ namespace MarketData
         vector<Sector> res;
 
         if (retVal.as_array().size() < 1) {
-            CPPFINANCIALDATA_ERROR("Could not retrieve current sector data");
+            CPPFINANCIALDATA_WARN("No data received");
         } else {
             auto jsonArr = retVal.as_array();
             for (auto it = jsonArr.begin(); it != jsonArr.end(); ++it) {
@@ -105,7 +104,10 @@ namespace MarketData
         string params = "/stock_market/actives?";
         json::value retVal = Connect::getJson(fmpUrl, params, fmpToken);
 
-        if (retVal.as_array().size() < 1) CPPFINANCIALDATA_FATAL("Unabale to get most active list, check api connection");
+        if (retVal.as_array().size() < 1) {
+            CPPFINANCIALDATA_WARN("No data received");
+            throw json::json_exception("No data");
+        }
 
         vector<NotableStock> res;
         auto jsonArr = retVal.as_array();

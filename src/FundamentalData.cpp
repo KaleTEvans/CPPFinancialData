@@ -1,5 +1,4 @@
 #include "FinancialData/FundamentalData.h"
-#include "FinancialData/FormatRequest.h"
 #include "Keys.h"
 
 namespace Fundamentals
@@ -14,8 +13,7 @@ namespace Fundamentals
         }
 
         json::value retVal = Connect::getJson(finnhubUrl, params, privateFinnhubToken);
-
-        if (retVal[U("metric")].is_null()) CPPFINANCIALDATA_ERROR("No financial data received for ticker input: {}", ticker);
+        if (retVal.at("metric").at("beta").is_null()) throw json::json_exception("object empty");
 
         return retVal;
     }
@@ -30,8 +28,9 @@ namespace Fundamentals
         json::value retVal = Connect::getJson(finnhubUrl, params, privateFinnhubToken);
         Earnings upcoming;
 
-        if (retVal[U("earningsCalendar")].is_null()) {
-            CPPFINANCIALDATA_WARN("No earnings data received for ticker input: {}", ticker);
+        if (retVal[U("earningsCalendar")].as_array().size() < 1) {
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
+            throw json::json_exception("No data");
         } else {
             auto earningsArr = retVal[U("earningsCalendar")].as_array();
 
@@ -65,7 +64,7 @@ namespace Fundamentals
         vector<Earnings> res;
 
         if (retVal.as_array().size() < 1) {
-            CPPFINANCIALDATA_ERROR("No historical earnings data received for {}", ticker);
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
         } else {
             auto earnigsArr = retVal.as_array();
 
@@ -101,8 +100,8 @@ namespace Fundamentals
 
         vector<SupplyChainRelations> res;
 
-        if (retVal[U("data")].is_null()) {
-            CPPFINANCIALDATA_WARN("No supply chain data received for ticker input: {}", ticker)
+        if (retVal[U("data")].as_array().size() < 1) {
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
         } else {
             auto supplyChainArr = retVal[U("data")].as_array();
 
@@ -152,15 +151,18 @@ namespace Fundamentals
         auto ret1 = retVal1.as_array();
         auto ret2 = retVal2.as_array();
 
-        if (ret1[0][U("peRatioTTM")].is_null()) CPPFINANCIALDATA_ERROR("No financial scores for the ticker: {}", ticker);
-
-        res.peRatio = ret1[0][U("peRatioTTM")].as_double();
-        res.pegRatio = ret1[0][U("pegRatioTTM")].as_double();
-        res.debtRatio = ret1[0][U("debtRatioTTM")].as_double();
-        res.debtEquityRatio = ret1[0][U("debtEquityRatioTTM")].as_double();
-        res.priceFairValue = ret1[0][U("priceFairValueTTM")].as_double();
-        res.netProfitMargin = ret1[0][U("netProfitMarginTTM")].as_double();
-        res.piotroskiScore = ret2[0][U("piotroskiScore")].as_double();
+        if (ret1[0][U("peRatioTTM")].is_null()) {
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
+            throw json::json_exception("No data");
+        } else {
+            res.peRatio = ret1[0][U("peRatioTTM")].as_double();
+            res.pegRatio = ret1[0][U("pegRatioTTM")].as_double();
+            res.debtRatio = ret1[0][U("debtRatioTTM")].as_double();
+            res.debtEquityRatio = ret1[0][U("debtEquityRatioTTM")].as_double();
+            res.priceFairValue = ret1[0][U("priceFairValueTTM")].as_double();
+            res.netProfitMargin = ret1[0][U("netProfitMarginTTM")].as_double();
+            res.piotroskiScore = ret2[0][U("piotroskiScore")].as_double();
+        }
 
         return res;
     }
@@ -171,7 +173,7 @@ namespace Fundamentals
 
         vector<FinancialScores> res;
         if (retVal.as_array().size() < 1) {
-            CPPFINANCIALDATA_WARN("No quarterly financial data avaliable for {}", ticker);
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
         } else {
             auto scoresArr = retVal.as_array();
 
@@ -206,31 +208,31 @@ namespace Fundamentals
         CompanyProfile res;
         res.symbol = ticker;
 
-        if (retVal1.as_array().size() < 1) CPPFINANCIALDATA_TRACE("No financial data available for {}", ticker);
-        if (retVal2.as_array().size() < 1) {
-            CPPFINANCIALDATA_WARN("No peers data for {}", ticker);
+        if (retVal1.as_array().size() < 1 || retVal2.as_array().size() < 1) {
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
+            throw json::json_exception("No data");
         } 
-            auto tempArr1 = retVal1.as_array();
-            auto tempArr2 = retVal2.as_array();
-            tempArr2 = tempArr2[0][U("peersList")].as_array();
-            vector<string> peers;
 
-            res.beta = tempArr1[0][U("beta")].as_double();
-            res.volAvg = tempArr1[0][U("volAvg")].as_double();
-            res.marketCap = tempArr1[0][U("mktCap")].as_double();
-            res.cik = tempArr1[0][U("cik")].as_string();
-            res.isin = tempArr1[0][U("isin")].as_string();
-            res.exchange = tempArr1[0][U("exchange")].as_string();
-            res.industry = tempArr1[0][U("industry")].as_string();
-            res.sector = tempArr1[0][U("sector")].as_string();
+        auto tempArr1 = retVal1.as_array();
+        auto tempArr2 = retVal2.as_array();
+        tempArr2 = tempArr2[0][U("peersList")].as_array();
+        vector<string> peers;
 
-            for (auto i : tempArr2) {
-                peers.push_back(i.as_string());
-            }
+        res.beta = tempArr1[0][U("beta")].as_double();
+        res.volAvg = tempArr1[0][U("volAvg")].as_double();
+        res.marketCap = tempArr1[0][U("mktCap")].as_double();
+        res.cik = tempArr1[0][U("cik")].as_string();
+        res.isin = tempArr1[0][U("isin")].as_string();
+        res.exchange = tempArr1[0][U("exchange")].as_string();
+        res.industry = tempArr1[0][U("industry")].as_string();
+        res.sector = tempArr1[0][U("sector")].as_string();
 
-            res.peers = peers;
+        for (auto i : tempArr2) {
+            peers.push_back(i.as_string());
+        }
 
-
+        res.peers = peers;
+            
         return res;
     }
 
@@ -241,7 +243,7 @@ namespace Fundamentals
         vector<InsiderTrade> res;
 
         if (retVal.as_array().size() < 1) {
-            CPPFINANCIALDATA_WARN("No insider trade data available for {}", ticker);
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
         } else {
             auto jsonArr = retVal.as_array();
             for (auto it = jsonArr.begin(); it != jsonArr.end(); ++it) {

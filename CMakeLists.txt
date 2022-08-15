@@ -27,6 +27,7 @@ target_sources(${PROJECT_NAME}
         src/NewsData.cpp
         src/MacroData.cpp
         src/MarketPerformance.cpp
+        src/Logger.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} 

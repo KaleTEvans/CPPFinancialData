@@ -63,6 +63,8 @@ namespace Fundamentals
         double totalTransaction;
     };
 
+    // ** Exceptions only thrown for functions returning single types
+
     // Can send a request for a single metric if necessary, most of these attributes can be found in other functions
     json::value getFinancialData(const string ticker, string metric = "");
 
