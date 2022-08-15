@@ -29,7 +29,20 @@ int main(int argc, char** argv) {
             cout << "2m: " << i.twoMonth << endl;
             cout << "2y: " << i.twoYear << endl;
             cout << "20y: " << i.twentyYear << endl;
+            cout << "----------" << endl;
         }   
+
+        vector<MacroData::EconomicIndicator> m1 = MacroData::getTreasuryHistory();
+        cout << "10Y Monthly Treasury History" << endl;
+        for (int i=0; i < 5; i++) {
+            cout << m1[i].attribute << ": " << m1[i].date << ": " << m1[i].value << endl;
+        }
+        cout << "----------" << endl;
+
+        vector<MacroData::EconomicIndicator> m2 = MacroData::getEconomicIndicator(MacroData::commercialBankCreditCardInterestRate, "2000-01-01");
+        for (int i=0; i < 5; i++) {
+            cout << m2[i].attribute << ": " << m2[i].date << ": " << m2[i].value << endl;
+        }
     }
     catch (web::json::json_exception& e) {
         CPPFINANCIALDATA_ERROR(e.what());

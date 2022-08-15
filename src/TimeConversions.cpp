@@ -37,10 +37,6 @@ namespace TimeConversions
         return time_buf;
     }
 
-    long convertToCST(long unixTime, long seconds) {
-        return unixTime - seconds;
-    }
-
     string getDayOfWeek(string date) {
         std::stringstream s(date);
         string day;

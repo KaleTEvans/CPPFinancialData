@@ -94,4 +94,41 @@ namespace News
 
         return res;
     }
+
+    vector<SocialSentiment> getSocialSentiment(const string ticker, string page) {
+        string params = "/historical/social-sentiment?symbol=" + ticker + "&page=" + page + "&";
+        json::value retVal = Connect::getJson("https://financialmodelingprep.com/api/v4", params, fmpToken);
+
+        vector<SocialSentiment> res;
+        if (retVal.as_array().size() < 1) {
+            // Because social traffic on certain stocks can be pretty hit or miss,
+            // There will likely be a lot of errors when using this function, so will just return an empty array if there is no data
+            CPPFINANCIALDATA_WARN("No data available for {} at page {}", ticker, page);
+        } else {
+            auto jsonArr = retVal.as_array();
+            for (auto it = jsonArr.begin(); it != jsonArr.end(); ++it) {
+                auto data = *it;
+                json::value dataObj = data;
+                
+                SocialSentiment temp;
+                temp.symbol = ticker;
+                temp.date = dataObj[U("date")].as_string();
+                temp.unixDate = TimeConversions::convertTimeToUnix(temp.date);
+                temp.stocktwitsPosts = dataObj[U("stocktwitsPosts")].as_double();
+                temp.twitterPosts = dataObj[U("twitterPosts")].as_double();
+                temp.stocktwitsComments = dataObj[U("stocktwitsComments")].as_double();
+                temp.twitterComments = dataObj[U("twitterComments")].as_double();
+                temp.stocktwitsLikes = dataObj[U("stocktwitsLikes")].as_double();
+                temp.twitterLikes = dataObj[U("twitterLikes")].as_double();
+                temp.stocktwitsImpressions = dataObj[U("stocktwitsImpressions")].as_double();
+                temp.twitterImpressions = dataObj[U("twitterImpressions")].as_double();
+                temp.stocktwitsSentiment = dataObj[U("stocktwitsSentiment")].as_double();
+                temp.twitterSentiment = dataObj[U("twitterSentiment")].as_double();
+
+                res.push_back(temp);
+            }
+        }
+
+        return res;
+    }
 }

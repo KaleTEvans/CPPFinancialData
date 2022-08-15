@@ -14,7 +14,7 @@ target_link_libraries(test-news cpprestsdk::cpprest FinancialData)
 
 add_test(NAME "test-fundamental" COMMAND "test-fundamental" "NVDA" WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 add_test(NAME "test-macro" COMMAND "test-macro" "NVDA" WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-add_test(NAME "test-market" COMMAND "test-market" "NVDA" WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+#add_test(NAME "test-market" COMMAND "test-market" "NVDA" WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 add_test(NAME "test-news" COMMAND "test-news" "NVDA" WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 #add_test(NAME "test-price" COMMAND "test-price" "NVDA" WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 #add_test(NAME "test-technical" COMMAND "test-technical" "NVDA" WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

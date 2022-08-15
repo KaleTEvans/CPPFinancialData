@@ -48,11 +48,11 @@ int main(int argc, char** argv) {
         // cout << "eps annual ttm: " << js[U("epsBasicExclExtraItemsTTM")].as_double() << endl;
         // cout << "-----------" << endl;
 
-        // Fundamentals::Earnings upcoming = Fundamentals::earningsUpcoming(testIn);
-        // cout << "date " << upcoming.date << endl;
-        // cout << "epsestimate " << upcoming.epsEstimate << endl;
-        // cout << "quarter " << upcoming.quarter << endl;
-        // cout << "-----------" << endl;
+        Fundamentals::Earnings upcoming = Fundamentals::earningsUpcoming(testIn);
+        cout << "date " << upcoming.date << endl;
+        cout << "epsestimate " << upcoming.epsEstimate << endl;
+        cout << "quarter " << upcoming.quarter << endl;
+        cout << "-----------" << endl;
 
         vector<Fundamentals::SupplyChainRelations> supply = Fundamentals::supplyChainData(testIn);
         for (auto k : supply) {
