@@ -17,6 +17,7 @@ namespace News
             throw json::json_exception("No data");
         }
 
+        sent.symbol = ticker;
         sent.articlesInLastWk = buzz[U("articlesInLastWeek")].as_double();
         sent.buzz = buzz[U("buzz")].as_double();
         sent.weeklyAvg = buzz[U("weeklyAverage")].as_double();
@@ -46,6 +47,7 @@ namespace News
                 string date = dataObj[U("date")].as_string();
                 NewsArticle temp;
 
+                temp.symbol = ticker;
                 temp.unixDate = TimeConversions::convertTimeToUnix(date);
                 temp.date = date;
                 temp.localDate = TimeConversions::convertUnixToDateTime(temp.unixDate);
@@ -77,6 +79,7 @@ namespace News
                 string date = dataObj[U("publishedDate")].as_string();
                 NewsArticle temp;
 
+                temp.symbol = ticker;
                 temp.date = date;
                 temp.unixDate = TimeConversions::convertTimeToUnix(date);
                 temp.localDate = TimeConversions::convertUnixToDateTime(temp.unixDate);

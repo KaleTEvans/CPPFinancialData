@@ -6,6 +6,7 @@
 namespace News
 {
     struct NewsSentiment {
+        string symbol;
         int articlesInLastWk;
         double buzz;
         double weeklyAvg;

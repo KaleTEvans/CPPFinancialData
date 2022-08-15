@@ -75,6 +75,10 @@ namespace Fundamentals
 
                 historical.date = data[U("date")].as_string();
                 historical.unixTime = TimeConversions::convertTimeToUnix(historical.date);
+
+                time_t now = time(0);
+                if (now < historical.unixTime) continue;
+
                 historical.epsEstimate = data[U("epsEstimated")].as_double();
                 historical.epsActual = data[U("eps")].as_double();
 

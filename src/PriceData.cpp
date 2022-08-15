@@ -79,7 +79,7 @@ namespace PriceData
             client.close().wait();
         }
         catch (std::error_code& code) {
-            CPPFINANCIALDATA_ERROR(code);
+            cout << code << endl;
         }
     }
 
