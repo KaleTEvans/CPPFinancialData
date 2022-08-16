@@ -48,30 +48,30 @@ int main(int argc, char** argv) {
         // cout << "eps annual ttm: " << js[U("epsBasicExclExtraItemsTTM")].as_double() << endl;
         // cout << "-----------" << endl;
 
-        Fundamentals::Earnings upcoming = Fundamentals::earningsUpcoming(testIn);
-        cout << "date " << upcoming.date << endl;
-        cout << "epsestimate " << upcoming.epsEstimate << endl;
-        cout << "quarter " << upcoming.quarter << endl;
-        cout << "-----------" << endl;
-
-        vector<Fundamentals::SupplyChainRelations> supply = Fundamentals::supplyChainData(testIn);
-        for (auto k : supply) {
-            cout << "related: " << k.relatedSymbol << endl;
-            cout << "2Wk Correlation: " << k.twoWkCorrelation << endl;
-            cout << "1Mo Corr: " << k.oneMonthCorrelation << endl;
-            cout << "1Yr corr: " << k.oneYrCorrelation << endl; 
-        }
-        cout << "-----------" << endl;
-
-        // // vector<string> v = {"AAPL", "TSLA"};
-        // // PriceData::FSocket* f = new PriceData::FSocket(v);
-        // // f->openSocket();
-        // // sleep(5);
-        // // delete f;
-
-        // vector<double> tempV = TechnicalData::getSupportAndResistance(testIn, "60");
-        // for (auto i : tempV) cout << i << endl;
+        // Fundamentals::Earnings upcoming = Fundamentals::earningsUpcoming(testIn);
+        // cout << "date " << upcoming.date << endl;
+        // cout << "epsestimate " << upcoming.epsEstimate << endl;
+        // cout << "quarter " << upcoming.quarter << endl;
         // cout << "-----------" << endl;
+
+        // vector<Fundamentals::SupplyChainRelations> supply = Fundamentals::supplyChainData(testIn);
+        // for (auto k : supply) {
+        //     cout << "related: " << k.relatedSymbol << endl;
+        //     cout << "2Wk Correlation: " << k.twoWkCorrelation << endl;
+        //     cout << "1Mo Corr: " << k.oneMonthCorrelation << endl;
+        //     cout << "1Yr corr: " << k.oneYrCorrelation << endl; 
+        // }
+        // cout << "-----------" << endl;
+
+        vector<string> v = {"AAPL", "TSLA"};
+        PriceData::FSocket* f = new PriceData::FSocket(v);
+        f->openSocket();
+        sleep(5);
+        delete f;
+
+        vector<double> tempV = TechnicalData::getSupportAndResistance("TSLA", "60");
+        for (auto i : tempV) cout << i << endl;
+        cout << "-----------" << endl;
 
         // TechnicalData::AggregateData agg(TechnicalData::getAggregateIndicators(testIn, "D"));
         // cout << "signal " << agg.signal << endl;

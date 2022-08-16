@@ -5,7 +5,12 @@ namespace PriceData
 {
     FSocket::FSocket(std::vector<std::string>& tickers) {
         // Add ticker values to array
-        for (auto i : tickers) ledger.push_back(i);
+        for (auto i : tickers) {
+            ledger.push_back(i);
+            StreamQuote q;
+            q.symbol = i;
+            tickerPrice[i] = q;
+        }
     }
 
     // When the class is deleted, close out the websocket
@@ -42,25 +47,24 @@ namespace PriceData
                 auto priceArr = jsonObject.at(U("data")).as_array();
                 for (auto it = priceArr.begin(); it != priceArr.end(); ++it) {
                     auto& data = *it;
-                    auto dataObj = data.as_object();
+                    auto dataObj = data;
 
-                    std::string name;
-                    double curPrice;
-                    
-                    // Retreive json values and populate to price map
-                    for (auto itInner = dataObj.cbegin(); itInner != dataObj.end(); ++itInner) {
-                        auto& key = itInner->first;
-                        if (key == "p") curPrice = itInner->second.as_double();
-                        if (key == "s") {
-                            name = itInner->second.as_string();
-                            tickerPrice[name] = curPrice;
-                            break;
-                        }
+                    string ticker = dataObj[U("s")].as_string();
+                    long unixTime = dataObj[U("t")].as_double();
+                    double price = dataObj[U("p")].as_double();
+                    long vol = dataObj[U("v")].as_double();
+
+                    auto val = tickerPrice.find(ticker);
+                    if (val != tickerPrice.end()) {
+                        val->second.unixTime = unixTime;
+                        val->second.price = price;
+                        val->second.volume = vol;
                     }
                 }
 
-                for (auto i : tickerPrice) {
-                    std::cout << i.first << ": " << i.second << std::endl;
+                for (auto i : ledger) {
+                    std::cout << i << "| time: " << tickerPrice[i].unixTime << " | price: " <<
+                     tickerPrice[i].price << " | volume: " << tickerPrice[i].volume << std::endl;
                 }
             }
         });
@@ -131,6 +135,36 @@ namespace PriceData
         res.bidVol = retVal[U("bv")].as_double();
         res.unixTime = retVal[U("t")].as_double() / 1000;
         res.localDate = TimeConversions::convertUnixToDateTime(res.unixTime);
+
+        return res;
+    }
+
+    vector<Candle> getHistoricalPrice(const string ticker, string interval) {
+        string params = "/historical-chart/" + interval + "/" + ticker + "?";
+        json::value retVal = Connect::getJson(fmpUrl, params, fmpToken);
+
+        vector<Candle> res;
+
+        if (retVal.as_array().size() < 1) {
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
+        } else {
+            auto jsonArr = retVal.as_array();
+            for (auto it = jsonArr.begin(); it != jsonArr.end(); ++it) {
+                auto data = *it;
+                json::value dataObj = data;
+                Candle temp;
+
+                temp.date = dataObj[U("date")].as_string();
+                temp.unixTime = TimeConversions::convertTimeToUnix(temp.date);
+                temp.open = dataObj[U("open")].as_double();
+                temp.low = dataObj[U("low")].as_double();
+                temp.high = dataObj[U("high")].as_double();
+                temp.close = dataObj[U("close")].as_double();
+                temp.volume = dataObj[U("volume")].as_double();
+
+                res.push_back(temp);
+            }
+        }
 
         return res;
     }
