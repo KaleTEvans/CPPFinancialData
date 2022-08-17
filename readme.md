@@ -92,8 +92,11 @@ AggregateData getAggregateIndicators(string ticker, string resolution); // Gathe
 
 ```C++
 NewsSentiment newsSentiment(string ticker) // Average news articles, bullish / bearish, sector averages, etc
+
 vector<NewsArticle> getPressReleases(string ticker, string limit) // Data goes back to about 2019
+
 vector<NewsArticle> getSingleStockNews(string ticker, string limit) // Same data as press releases but not as tailored to a single ticker
+
 vector<SocialSentiment> getSocialSentiment(string ticker, string page) // 100 per page, data from stocktwits and twitter
 ```
 
@@ -103,8 +106,11 @@ vector<SocialSentiment> getSocialSentiment(string ticker, string page) // 100 pe
 
 ```C++
 vector<EconomicEvent> getEconomicCalendar(string from, string to) // Get economic calendar, filters only EU and US events with an impact of medium-high
+
 vector<TreasuryRates> getTreasuryRates(string from, string to) // Default will give last 30 days, maximum is 3 months of data at a time, these are updated daily
+
 vector<EconomicIndicator> getTreasuryHistory(string maturity, string interval) // Available intervals are 3month, 2year, 5year, 7year, 10year, and 30year
+
 vector<EconomicIndicator> getEconomicIndicator(string indicator, string from, string to) // Various data, listed in header file
 ```
 
@@ -113,7 +119,10 @@ vector<EconomicIndicator> getEconomicIndicator(string indicator, string from, st
 
 ```C++
 vector<Sector> getSingleSectorMetrics(string date) // Array contains each ector current P/E, daily data
+
 vector<Sector> getHistoricalSectorPctChange(string sector, string limit)
+
 vector<Sector> getCurrentSectorChange() // Percent change for each sector, updated hourly
+
 vector<NotableStock> getMostActiveStocks()
 ```
