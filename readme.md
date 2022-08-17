@@ -35,68 +35,35 @@ In the future, planned additions are:
 * Stream current price data for up to 10 different tickers
 
 ```c++
-PriceData::FSocket* socket = new PriceData::FSocket(std::vector<std::string>& tickers);
-socket->openSocket() // Adds tickers to queue and calls runSocket(), which opens up the socket connection
-// Run for specified amount of time
+FSocket* socket = new FSocket(std::vector<std::string>& tickers)
+socket->openSocket() // Adds tickers to queue and calls runSocket(), which opens up the socket connection until destructor is called
 delete socket; // Calls closeSocket() and ends socket connection
 ```
 
-## Finnhub Connections
+## Data Methods
 
 ### PriceData namespace
 * Get various data points for a single ticker
 
 ```c++
-unordered_map<string, double> PriceData::getQuote(string ticker);
-// Returns the following values:
-"current" // current price
-"pctchange" // percent change
-"highofday" // high price of day
-"lowofday" // low price of day
-"open" // opening price
-"prevclose" // close from previous day  
-
-unordered_map<string, double> PriceData::latestBidAsk(string ticker);
-// Returns the following values
-"ask"
-"askvol"
-"bid"
-"bidvol"
-"time" // time in unix
+Quote getQuote(string ticker)
+BidAsk latestBidAsk(string ticker)
+vector<Candle> getHistoricalPrice(string ticker, string interval) // Gives price data for up to about two months, depending on interval
 ```
 
 ### Fundamentals namespace
 * Get fundamental data about a certain stock
+* NOTE: Default limit is 1
 
 ```c++
-unordered_map<string, double> Fundamentals::NewsSentiment(string ticker);
-// Returns various news sentiment scores and traffic
-"articlesinlastweek" 
-"buzz" // score for amount of current news traffic
-"weeklyaverage"
-"companynewsscore" // NOTE: All scores are based from 0-1
-"sectoravgbullishpct"
-"sectoravgnewsscore"
-"bearsentiment"
-"bullsentiment"
-
-json::value Fundamentals::getFinancialData(string ticker, string metric);
-// This is left as a json object because there are hundreds of metrics to choose from 
-
-unordered_map<string, double> Fundamentals::earningsUpcoming(string ticker) ;
-// Returns the closest upcoming earnings data
-"date" // YYYY-MM-DD
-"quarter"
-"epsestimate"
-"timecode"
-"year"
-
-std::pair<long, int> Fundamentals::twitterMentions(string ticker);
-// Returns the unix stamp and number of tweets about the specific ticker within the last hour
-
-vector<SupplyChainRelations*> Fundamentals::supplyChainData(string ticker);
-// Returns suppliers and customers for a certain company
-// View the FinnhubConnections.h to see what data points are contained in the SupplyChainRelations type
+json::value getFinancialData(string ticker, string metric) // Many different metrics, see finnhub api docs
+Earnings earningsUpcoming(string ticker) // Nearest upcoming earnings date and estimates
+vector<Earnings> earningsHistorical(cstring ticker, string limit) // Get list of all historical earnings 
+vector<SupplyChainRelations> supplyChainData(string ticker) // Suppliers and customers for a certain company and their level of correlation
+FinancialScores getFinancialScores(string ticker) // Get financial scores, such as P/E, debt ratio, etc
+vector<FinancialScores> getQuarterlyFinancialScores(string ticker, string limit)
+CompanyProfile getCompanyProfile(string ticker) // Attributes such as beta, average volume, market cap, etc
+vector<InsiderTrades> getCompanyInsiderTrades(string ticker, string limit) // List of all insider transactions and dates
 ```
 
 ### TechnicalData namespace
@@ -104,20 +71,39 @@ vector<SupplyChainRelations*> Fundamentals::supplyChainData(string ticker);
 * NOTE: Default resolution is one day (D)
 
 ```c++
- vector<ChartPatternData*> getChartPatterns(const string ticker, string resolution);
- // Returns an array of chart pattern data types
- // These are all public data members
- string patternName; // Get the name of the current chart pattern
- string patternType; // Bullish or Bearish
- string status; // Complete or Incomplete
- vector<pair<string, float>> pricePoints; // Contains the price points and unix times that form the pattern
+vector<double> getSupportAndResistance(string ticker, string resolution); 
+AggregateData getAggregateIndicators(string ticker, string resolution); // Gathers signals from various technical indicators and provides a summary
 
- vector<double> getSupportAndResistance(string ticker, string resolution);
- // Returns a vector of support and resistance prices
+```
 
- AggregateData getAggregateIndicators(string ticker, string resolution);
- // Returns AggregateData type containing three public members
- string signal; // Bullish, bearish, or neutral
- double adx; // ADX reading
- bool trend; // Whether the ADX indicates the stock is trending
+### News namespace
+* Get news information, such as sentiment, historical articles, with detailed descriptions
+* NOTE: Default limit is 1, Default page is 0
+
+```C++
+NewsSentiment newsSentiment(string ticker) // Average news articles, bullish / bearish, sector averages, etc
+vector<NewsArticle> getPressReleases(string ticker, string limit) // Data goes back to about 2019
+vector<NewsArticle> getSingleStockNews(string ticker, string limit) // Same data as press releases but not as tailored to a single ticker
+vector<SocialSentiment> getSocialSentiment(string ticker, string page) // 100 per page, data from stocktwits and twitter
+```
+
+## MacroData namespace
+* Macroeconomic data with about 50 years of historical data
+* NOTE: Default 'to' date is your current local date
+
+```C++
+vector<EconomicEvent> getEconomicCalendar(string from, string to) // Get economic calendar, filters only EU and US events with an impact of medium-high
+vector<TreasuryRates> getTreasuryRates(string from, string to) // Default will give last 30 days, maximum is 3 months of data at a time, these are updated daily
+vector<EconomicIndicator> getTreasuryHistory(string maturity, string interval) // Available intervals are 3month, 2year, 5year, 7year, 10year, and 30year
+vector<EconomicIndicator> getEconomicIndicator(string indicator, string from, string to) // Various data, listed in header file
+```
+
+## MarketData namespace
+* Sector data and active stocks
+
+```C++
+vector<Sector> getSingleSectorMetrics(string date) // Array contains each ector current P/E, daily data
+vector<Sector> getHistoricalSectorPctChange(string sector, string limit)
+vector<Sector> getCurrentSectorChange() // Percent change for each sector, updated hourly
+vector<NotableStock> getMostActiveStocks()
 ```

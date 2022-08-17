@@ -24,7 +24,6 @@ namespace PriceData
             void closeSocket();
 
             json::value fromString(std::string const &input);
-            void addTickerToLedger(std::string symbol);
 
         private:
             websocket_callback_client client;

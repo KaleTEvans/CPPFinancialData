@@ -10,6 +10,8 @@ namespace Fundamentals
         long unixTime;
         double epsEstimate;
         double epsActual = 0;
+        double revenueEstimate;
+        double revenueActual = 0;
         int quarter = 0;
         int timeCode;
         int year = 0;

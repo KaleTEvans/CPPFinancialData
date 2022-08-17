@@ -40,6 +40,7 @@ namespace Fundamentals
             upcoming.unixTime = TimeConversions::convertTimeToUnix(earnings[U("date")].as_string());
 
             upcoming.epsEstimate = earnings[U("epsEstimate")].as_double();
+            upcoming.revenueEstimate = earnings[U("revenueEstimate")].as_double();
             upcoming.quarter = earnings[U("quarter")].as_double();
 
             // 1 : before open, 2 : after close, 3 : during 
@@ -81,6 +82,8 @@ namespace Fundamentals
 
                 historical.epsEstimate = data[U("epsEstimated")].as_double();
                 historical.epsActual = data[U("eps")].as_double();
+                historical.revenueActual = data[U("revenue")].as_double();
+                historical.revenueEstimate = data[U("revenueEstimated")].as_double();
 
                 // 1 : before open, 2 : after close, 3 : during 
                 auto hour = data[U("time")].as_string();
