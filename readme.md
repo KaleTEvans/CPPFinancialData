@@ -36,7 +36,9 @@ In the future, planned additions are:
 
 ```c++
 FSocket* socket = new FSocket(std::vector<std::string>& tickers)
+
 socket->openSocket() // Adds tickers to queue and calls runSocket(), which opens up the socket connection until destructor is called
+
 delete socket; // Calls closeSocket() and ends socket connection
 ```
 
@@ -47,7 +49,9 @@ delete socket; // Calls closeSocket() and ends socket connection
 
 ```c++
 Quote getQuote(string ticker)
+
 BidAsk latestBidAsk(string ticker)
+
 vector<Candle> getHistoricalPrice(string ticker, string interval) // Gives price data for up to about two months, depending on interval
 ```
 
@@ -57,12 +61,18 @@ vector<Candle> getHistoricalPrice(string ticker, string interval) // Gives price
 
 ```c++
 json::value getFinancialData(string ticker, string metric) // Many different metrics, see finnhub api docs
+
 Earnings earningsUpcoming(string ticker) // Nearest upcoming earnings date and estimates
+
 vector<Earnings> earningsHistorical(cstring ticker, string limit) // Get list of all historical earnings 
+
 vector<SupplyChainRelations> supplyChainData(string ticker) // Suppliers and customers for a certain company and their level of correlation
+
 FinancialScores getFinancialScores(string ticker) // Get financial scores, such as P/E, debt ratio, etc
+
 vector<FinancialScores> getQuarterlyFinancialScores(string ticker, string limit)
 CompanyProfile getCompanyProfile(string ticker) // Attributes such as beta, average volume, market cap, etc
+
 vector<InsiderTrades> getCompanyInsiderTrades(string ticker, string limit) // List of all insider transactions and dates
 ```
 
@@ -87,7 +97,7 @@ vector<NewsArticle> getSingleStockNews(string ticker, string limit) // Same data
 vector<SocialSentiment> getSocialSentiment(string ticker, string page) // 100 per page, data from stocktwits and twitter
 ```
 
-## MacroData namespace
+### MacroData namespace
 * Macroeconomic data with about 50 years of historical data
 * NOTE: Default 'to' date is your current local date
 
@@ -98,7 +108,7 @@ vector<EconomicIndicator> getTreasuryHistory(string maturity, string interval) /
 vector<EconomicIndicator> getEconomicIndicator(string indicator, string from, string to) // Various data, listed in header file
 ```
 
-## MarketData namespace
+### MarketData namespace
 * Sector data and active stocks
 
 ```C++
