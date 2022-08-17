@@ -24,10 +24,8 @@ $ cmake .. && make
 
 ## Features
 * Financial data from Finnhub
-
-In the future, planned additions are:
-* AlphaVantage historical data
-* IEX
+* Financial data from FMP
+* Financial data from AlphaVantage
 
 ## Current Functions
 
