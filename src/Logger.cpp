@@ -6,7 +6,7 @@ namespace managers
 
     void LogManager::Initialize() {
         auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        consoleSink->set_pattern("%^[%Y-%m-%d %H:%M:%S]%$ [ src: %s ] [ function: %! ] [ line: %# ] [ %l ] %v");
+        consoleSink->set_pattern("[%Y-%m-%d %H:%M:%S] %^[ src: %s ] [ function: %! ] [ line: %# ] [ %l ]%$ %v");
         auto fileLogger = std::make_shared<spdlog::sinks::basic_file_sink_mt>("../../logs/logs.txt");
         fileLogger->set_pattern("[%Y-%m-%d %H:%M:%S] [%l] [%@] %v");
 
