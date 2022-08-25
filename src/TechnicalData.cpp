@@ -9,7 +9,7 @@ namespace TechnicalData
         
         vector<double> res;
 
-        if (retVal[U("levels")].is_null()) {
+        if (retVal[U("levels")].as_array().size() < 1) {
             CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
         } else {
             auto levelData = retVal[U("levels")].as_array();
