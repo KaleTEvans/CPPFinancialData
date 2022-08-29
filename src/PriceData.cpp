@@ -20,7 +20,7 @@ namespace PriceData
 
     void FSocket::openSocket() {
         // Connect to the client and open connection
-        client.connect(U("wss://ws.finnhub.io?token=" + privateFinnHubKey)).then([](){
+        client.connect(_XPLATSTR("wss://ws.finnhub.io?token=" + privateFinnHubKey)).then([](){
             std::cout << "Socket Connection Established" << std::endl;
         }).wait();
 
@@ -44,15 +44,15 @@ namespace PriceData
 
             // ensure that there is only price data coming into the stream
             if (jsonObject.has_field("data")) {
-                auto priceArr = jsonObject.at(U("data")).as_array();
+                auto priceArr = jsonObject.at(_XPLATSTR("data")).as_array();
                 for (auto it = priceArr.begin(); it != priceArr.end(); ++it) {
                     auto& data = *it;
                     auto dataObj = data;
 
-                    string ticker = dataObj[U("s")].as_string();
-                    long unixTime = dataObj[U("t")].as_double();
-                    double price = dataObj[U("p")].as_double();
-                    long vol = dataObj[U("v")].as_double();
+                    string ticker = dataObj[_XPLATSTR("s")].as_string();
+                    long unixTime = dataObj[_XPLATSTR("t")].as_double();
+                    double price = dataObj[_XPLATSTR("p")].as_double();
+                    long vol = dataObj[_XPLATSTR("v")].as_double();
 
                     auto val = tickerPrice.find(ticker);
                     if (val != tickerPrice.end()) {
@@ -96,7 +96,7 @@ namespace PriceData
         string params = "quote?symbol=" + ticker;
         json::value retVal = Connect::getJson(finnhubUrl, params, privateFinnhubToken);
 
-        if (retVal.is_null() || retVal[U("c")].as_double() <= 0) {
+        if (retVal.is_null() || retVal[_XPLATSTR("c")].as_double() <= 0) {
             CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
             throw json::json_exception("No data");
         }
@@ -104,14 +104,14 @@ namespace PriceData
         Quote res;
 
         // Values
-        res.current = retVal[U("c")].as_double();
-        res.priceChange = retVal[U("d")].as_double();
-        res.pctChange = retVal[U("dp")].as_double();
-        res.high = retVal[U("h")].as_double();
-        res.low = retVal[U("l")].as_double();
-        res.open = retVal[U("o")].as_double();
-        res.prevClose = retVal[U("pc")].as_double();
-        res.unixTime = retVal[U("t")].as_double();
+        res.current = retVal[_XPLATSTR("c")].as_double();
+        res.priceChange = retVal[_XPLATSTR("d")].as_double();
+        res.pctChange = retVal[_XPLATSTR("dp")].as_double();
+        res.high = retVal[_XPLATSTR("h")].as_double();
+        res.low = retVal[_XPLATSTR("l")].as_double();
+        res.open = retVal[_XPLATSTR("o")].as_double();
+        res.prevClose = retVal[_XPLATSTR("pc")].as_double();
+        res.unixTime = retVal[_XPLATSTR("t")].as_double();
         res.localDate = TimeConversions::convertUnixToDateTime(res.unixTime);
 
         return res;
@@ -123,17 +123,17 @@ namespace PriceData
 
         BidAsk res;
 
-        if (retVal.is_null() || retVal[U("a")].as_double() <= 0) {
+        if (retVal.is_null() || retVal[_XPLATSTR("a")].as_double() <= 0) {
             CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
             throw json::json_exception("No data");
         }
 
         // Values
-        res.ask = retVal[U("a")].as_double();
-        res.askVol = retVal[U("av")].as_double();
-        res.bid = retVal[U("b")].as_double();
-        res.bidVol = retVal[U("bv")].as_double();
-        res.unixTime = retVal[U("t")].as_double() / 1000;
+        res.ask = retVal[_XPLATSTR("a")].as_double();
+        res.askVol = retVal[_XPLATSTR("av")].as_double();
+        res.bid = retVal[_XPLATSTR("b")].as_double();
+        res.bidVol = retVal[_XPLATSTR("bv")].as_double();
+        res.unixTime = retVal[_XPLATSTR("t")].as_double() / 1000;
         res.localDate = TimeConversions::convertUnixToDateTime(res.unixTime);
 
         return res;
@@ -154,13 +154,13 @@ namespace PriceData
                 json::value dataObj = data;
                 Candle temp;
 
-                temp.date = dataObj[U("date")].as_string();
+                temp.date = dataObj[_XPLATSTR("date")].as_string();
                 temp.unixTime = TimeConversions::convertTimeToUnix(temp.date);
-                temp.open = dataObj[U("open")].as_double();
-                temp.low = dataObj[U("low")].as_double();
-                temp.high = dataObj[U("high")].as_double();
-                temp.close = dataObj[U("close")].as_double();
-                temp.volume = dataObj[U("volume")].as_double();
+                temp.open = dataObj[_XPLATSTR("open")].as_double();
+                temp.low = dataObj[_XPLATSTR("low")].as_double();
+                temp.high = dataObj[_XPLATSTR("high")].as_double();
+                temp.close = dataObj[_XPLATSTR("close")].as_double();
+                temp.volume = dataObj[_XPLATSTR("volume")].as_double();
 
                 res.push_back(temp);
             }

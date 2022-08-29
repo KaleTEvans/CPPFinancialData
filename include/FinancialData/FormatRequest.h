@@ -1,6 +1,8 @@
 #ifndef FORMATREQUEST_H
 #define FORMATREQUEST_H
 
+#define _TURN_OFF_PLATFORM_STRING
+
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
 #include <cpprest/uri.h>

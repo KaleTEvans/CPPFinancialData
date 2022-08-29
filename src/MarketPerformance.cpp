@@ -21,8 +21,8 @@ namespace MarketData
                 Sector temp;
 
                 temp.date = date;
-                temp.sector = dataObj[U("sector")].as_string();
-                string pe = dataObj[U("pe")].as_string();
+                temp.sector = dataObj[_XPLATSTR("sector")].as_string();
+                string pe = dataObj[_XPLATSTR("pe")].as_string();
                 temp.peRatio = std::stod(pe);
 
                 res.push_back(temp);
@@ -59,8 +59,8 @@ namespace MarketData
                 json::value dataObj = data;
                 Sector temp;
 
-                temp.date = dataObj[U("date")].as_string();
-                temp.changePct = dataObj[U(map[sector])].as_double();
+                temp.date = dataObj[_XPLATSTR("date")].as_string();
+                temp.changePct = dataObj[_XPLATSTR(map[sector])].as_double();
                 temp.sector = sector;
 
                 res.push_back(temp);
@@ -85,13 +85,13 @@ namespace MarketData
                 json::value dataObj = data;
                 Sector temp;
 
-                if (dataObj[U("sector")].as_string() == "Materials") temp.sector = "Basic Materials";
-                else if (dataObj[U("sector")].as_string() == "Financials") temp.sector = "Financial Services";
-                else if (dataObj[U("sector")].as_string() == "Health Care") temp.sector = "Healthcare";
-                else if (dataObj[U("sector")].as_string() == "Information Technology") temp.sector = "Technology";
-                else temp.sector = dataObj[U("sector")].as_string();
+                if (dataObj[_XPLATSTR("sector")].as_string() == "Materials") temp.sector = "Basic Materials";
+                else if (dataObj[_XPLATSTR("sector")].as_string() == "Financials") temp.sector = "Financial Services";
+                else if (dataObj[_XPLATSTR("sector")].as_string() == "Health Care") temp.sector = "Healthcare";
+                else if (dataObj[_XPLATSTR("sector")].as_string() == "Information Technology") temp.sector = "Technology";
+                else temp.sector = dataObj[_XPLATSTR("sector")].as_string();
 
-                temp.changePct = std::stod(dataObj[U("changesPercentage")].as_string());
+                temp.changePct = std::stod(dataObj[_XPLATSTR("changesPercentage")].as_string());
 
                 res.push_back(temp);
             }
@@ -116,11 +116,11 @@ namespace MarketData
             json::value dataObj = data;
             NotableStock stock;
 
-            stock.symbol = dataObj[U("symbol")].as_string();
-            stock.name = dataObj[U("name")].as_string();
-            stock.priceChange = dataObj[U("change")].as_double();
-            stock.price = dataObj[U("price")].as_double();
-            stock.changePct = dataObj[U("changesPercentage")].as_double();
+            stock.symbol = dataObj[_XPLATSTR("symbol")].as_string();
+            stock.name = dataObj[_XPLATSTR("name")].as_string();
+            stock.priceChange = dataObj[_XPLATSTR("change")].as_double();
+            stock.price = dataObj[_XPLATSTR("price")].as_double();
+            stock.changePct = dataObj[_XPLATSTR("changesPercentage")].as_double();
 
             res.push_back(stock);
         }

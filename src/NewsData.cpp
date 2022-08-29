@@ -9,8 +9,8 @@ namespace News
 
         NewsSentiment sent;
 
-        json::value buzz = retVal[U("buzz")];
-        json::value sentiment = retVal[U("sentiment")];
+        json::value buzz = retVal[_XPLATSTR("buzz")];
+        json::value sentiment = retVal[_XPLATSTR("sentiment")];
 
         if (buzz.is_null()) {
             CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
@@ -18,14 +18,14 @@ namespace News
         }
 
         sent.symbol = ticker;
-        sent.articlesInLastWk = buzz[U("articlesInLastWeek")].as_double();
-        sent.buzz = buzz[U("buzz")].as_double();
-        sent.weeklyAvg = buzz[U("weeklyAverage")].as_double();
-        sent.companyNewsScore = retVal[U("companyNewsScore")].as_double();
-        sent.sectorAvgBullishPct = retVal[U("sectorAverageBullishPercent")].as_double();
-        sent.sectorAvgNewsScore = retVal[U("sectorAverageNewsScore")].as_double();
-        sent.bearSentiment = sentiment[U("bearishPercent")].as_double();
-        sent.bullSentiment = sentiment[U("bullishPercent")].as_double();
+        sent.articlesInLastWk = buzz[_XPLATSTR("articlesInLastWeek")].as_double();
+        sent.buzz = buzz[_XPLATSTR("buzz")].as_double();
+        sent.weeklyAvg = buzz[_XPLATSTR("weeklyAverage")].as_double();
+        sent.companyNewsScore = retVal[_XPLATSTR("companyNewsScore")].as_double();
+        sent.sectorAvgBullishPct = retVal[_XPLATSTR("sectorAverageBullishPercent")].as_double();
+        sent.sectorAvgNewsScore = retVal[_XPLATSTR("sectorAverageNewsScore")].as_double();
+        sent.bearSentiment = sentiment[_XPLATSTR("bearishPercent")].as_double();
+        sent.bullSentiment = sentiment[_XPLATSTR("bullishPercent")].as_double();
 
         return sent;
     }
@@ -44,7 +44,7 @@ namespace News
                 auto data = *it;
                 json::value dataObj = data;
 
-                string date = dataObj[U("date")].as_string();
+                string date = dataObj[_XPLATSTR("date")].as_string();
                 NewsArticle temp;
 
                 temp.symbol = ticker;
@@ -52,8 +52,8 @@ namespace News
                 temp.date = date;
                 temp.localDate = TimeConversions::convertUnixToDateTime(temp.unixDate);
 
-                temp.title = dataObj[U("title")].as_string();
-                temp.text = dataObj[U("text")].as_string();
+                temp.title = dataObj[_XPLATSTR("title")].as_string();
+                temp.text = dataObj[_XPLATSTR("text")].as_string();
                 
                 res.push_back(temp);
             }
@@ -76,7 +76,7 @@ namespace News
                 auto data = *it;
                 json::value dataObj = data;
 
-                string date = dataObj[U("publishedDate")].as_string();
+                string date = dataObj[_XPLATSTR("publishedDate")].as_string();
                 NewsArticle temp;
 
                 temp.symbol = ticker;
@@ -84,9 +84,9 @@ namespace News
                 temp.unixDate = TimeConversions::convertTimeToUnix(date);
                 temp.localDate = TimeConversions::convertUnixToDateTime(temp.unixDate);
 
-                temp.title = dataObj[U("title")].as_string();
-                temp.text = dataObj[U("text")].as_string();
-                temp.source = dataObj[U("site")].as_string();
+                temp.title = dataObj[_XPLATSTR("title")].as_string();
+                temp.text = dataObj[_XPLATSTR("text")].as_string();
+                temp.source = dataObj[_XPLATSTR("site")].as_string();
 
                 res.push_back(temp);
             }
@@ -112,18 +112,18 @@ namespace News
                 
                 SocialSentiment temp;
                 temp.symbol = ticker;
-                temp.date = dataObj[U("date")].as_string();
+                temp.date = dataObj[_XPLATSTR("date")].as_string();
                 temp.unixDate = TimeConversions::convertTimeToUnix(temp.date);
-                temp.stocktwitsPosts = dataObj[U("stocktwitsPosts")].as_double();
-                temp.twitterPosts = dataObj[U("twitterPosts")].as_double();
-                temp.stocktwitsComments = dataObj[U("stocktwitsComments")].as_double();
-                temp.twitterComments = dataObj[U("twitterComments")].as_double();
-                temp.stocktwitsLikes = dataObj[U("stocktwitsLikes")].as_double();
-                temp.twitterLikes = dataObj[U("twitterLikes")].as_double();
-                temp.stocktwitsImpressions = dataObj[U("stocktwitsImpressions")].as_double();
-                temp.twitterImpressions = dataObj[U("twitterImpressions")].as_double();
-                temp.stocktwitsSentiment = dataObj[U("stocktwitsSentiment")].as_double();
-                temp.twitterSentiment = dataObj[U("twitterSentiment")].as_double();
+                temp.stocktwitsPosts = dataObj[_XPLATSTR("stocktwitsPosts")].as_double();
+                temp.twitterPosts = dataObj[_XPLATSTR("twitterPosts")].as_double();
+                temp.stocktwitsComments = dataObj[_XPLATSTR("stocktwitsComments")].as_double();
+                temp.twitterComments = dataObj[_XPLATSTR("twitterComments")].as_double();
+                temp.stocktwitsLikes = dataObj[_XPLATSTR("stocktwitsLikes")].as_double();
+                temp.twitterLikes = dataObj[_XPLATSTR("twitterLikes")].as_double();
+                temp.stocktwitsImpressions = dataObj[_XPLATSTR("stocktwitsImpressions")].as_double();
+                temp.twitterImpressions = dataObj[_XPLATSTR("twitterImpressions")].as_double();
+                temp.stocktwitsSentiment = dataObj[_XPLATSTR("stocktwitsSentiment")].as_double();
+                temp.twitterSentiment = dataObj[_XPLATSTR("twitterSentiment")].as_double();
 
                 res.push_back(temp);
             }

@@ -28,23 +28,23 @@ namespace Fundamentals
         json::value retVal = Connect::getJson(finnhubUrl, params, privateFinnhubToken);
         Earnings upcoming;
 
-        if (retVal[U("earningsCalendar")].as_array().size() < 1) {
+        if (retVal[_XPLATSTR("earningsCalendar")].as_array().size() < 1) {
             CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
             throw json::json_exception("No data");
         } else {
-            auto earningsArr = retVal[U("earningsCalendar")].as_array();
+            auto earningsArr = retVal[_XPLATSTR("earningsCalendar")].as_array();
 
             json::value earnings = earningsArr[earningsArr.size()-1];
 
-            upcoming.date = earnings[U("date")].as_string();
-            upcoming.unixTime = TimeConversions::convertTimeToUnix(earnings[U("date")].as_string());
+            upcoming.date = earnings[_XPLATSTR("date")].as_string();
+            upcoming.unixTime = TimeConversions::convertTimeToUnix(earnings[_XPLATSTR("date")].as_string());
 
-            upcoming.epsEstimate = earnings[U("epsEstimate")].as_double();
-            upcoming.revenueEstimate = earnings[U("revenueEstimate")].as_double();
-            upcoming.quarter = earnings[U("quarter")].as_double();
+            upcoming.epsEstimate = earnings[_XPLATSTR("epsEstimate")].as_double();
+            upcoming.revenueEstimate = earnings[_XPLATSTR("revenueEstimate")].as_double();
+            upcoming.quarter = earnings[_XPLATSTR("quarter")].as_double();
 
             // 1 : before open, 2 : after close, 3 : during 
-            auto hour = earnings[U("hour")].as_string();
+            auto hour = earnings[_XPLATSTR("hour")].as_string();
             int timeCode;
             if (hour == "bmo") timeCode = 1;
             else if (hour == "amc") timeCode = 2;
@@ -52,7 +52,7 @@ namespace Fundamentals
             else timeCode = 0;
 
             upcoming.timeCode = timeCode;
-            upcoming.year = earnings[U("year")].as_double();
+            upcoming.year = earnings[_XPLATSTR("year")].as_double();
         }
 
         return upcoming;
@@ -74,19 +74,19 @@ namespace Fundamentals
                 json::value dataObj = data;
                 Earnings historical;
 
-                historical.date = data[U("date")].as_string();
+                historical.date = data[_XPLATSTR("date")].as_string();
                 historical.unixTime = TimeConversions::convertTimeToUnix(historical.date);
 
                 time_t now = time(0);
                 if (now < historical.unixTime) continue;
 
-                historical.epsEstimate = data[U("epsEstimated")].as_double();
-                historical.epsActual = data[U("eps")].as_double();
-                historical.revenueActual = data[U("revenue")].as_double();
-                historical.revenueEstimate = data[U("revenueEstimated")].as_double();
+                historical.epsEstimate = data[_XPLATSTR("epsEstimated")].as_double();
+                historical.epsActual = data[_XPLATSTR("eps")].as_double();
+                historical.revenueActual = data[_XPLATSTR("revenue")].as_double();
+                historical.revenueEstimate = data[_XPLATSTR("revenueEstimated")].as_double();
 
                 // 1 : before open, 2 : after close, 3 : during 
-                auto hour = data[U("time")].as_string();
+                auto hour = data[_XPLATSTR("time")].as_string();
                 int timeCode;
                 if (hour == "bmo") timeCode = 1;
                 else if (hour == "amc") timeCode = 2;
@@ -107,24 +107,24 @@ namespace Fundamentals
 
         vector<SupplyChainRelations> res;
 
-        if (retVal[U("data")].as_array().size() < 1) {
+        if (retVal[_XPLATSTR("data")].as_array().size() < 1) {
             CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
         } else {
-            auto supplyChainArr = retVal[U("data")].as_array();
+            auto supplyChainArr = retVal[_XPLATSTR("data")].as_array();
 
             for (auto it = supplyChainArr.begin(); it != supplyChainArr.end(); ++it) {
                 auto data = *it;
                 json::value dataObj = data;
 
                 // ensure there are no null values
-                if (dataObj[U("country")].is_null()) continue;
-                if (dataObj[U("twoWeekCorrelation")].is_null()) continue;
-                if (dataObj[U("oneMonthCorrelation")].is_null()) continue;
-                if (dataObj[U("oneYearCorrelation")].is_null()) continue;
+                if (dataObj[_XPLATSTR("country")].is_null()) continue;
+                if (dataObj[_XPLATSTR("twoWeekCorrelation")].is_null()) continue;
+                if (dataObj[_XPLATSTR("oneMonthCorrelation")].is_null()) continue;
+                if (dataObj[_XPLATSTR("oneYearCorrelation")].is_null()) continue;
 
-                string country = dataObj[U("country")].as_string();
-                float twoWkCorrelation = dataObj[U("twoWeekCorrelation")].as_double();
-                float oneMonthCorrelation = dataObj[U("oneMonthCorrelation")].as_double();
+                string country = dataObj[_XPLATSTR("country")].as_string();
+                float twoWkCorrelation = dataObj[_XPLATSTR("twoWeekCorrelation")].as_double();
+                float oneMonthCorrelation = dataObj[_XPLATSTR("oneMonthCorrelation")].as_double();
 
                 // only look for US suppliers
                 if (country != "US") continue;
@@ -136,10 +136,10 @@ namespace Fundamentals
                 temp.twoWkCorrelation = twoWkCorrelation;
                 temp.oneMonthCorrelation = oneMonthCorrelation;
 
-                temp.oneYrCorrelation = dataObj[U("oneYearCorrelation")].as_double();
-                temp.customer = dataObj[U("customer")].as_bool();
-                temp.supplier = dataObj[U("supplier")].as_bool();
-                temp.relatedSymbol = dataObj[U("symbol")].as_string();
+                temp.oneYrCorrelation = dataObj[_XPLATSTR("oneYearCorrelation")].as_double();
+                temp.customer = dataObj[_XPLATSTR("customer")].as_bool();
+                temp.supplier = dataObj[_XPLATSTR("supplier")].as_bool();
+                temp.relatedSymbol = dataObj[_XPLATSTR("symbol")].as_string();
 
                 res.push_back(temp);
             }
@@ -158,17 +158,17 @@ namespace Fundamentals
         auto ret1 = retVal1.as_array();
         auto ret2 = retVal2.as_array();
 
-        if (ret1[0][U("peRatioTTM")].is_null()) {
+        if (ret1[0][_XPLATSTR("peRatioTTM")].is_null()) {
             CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
             throw json::json_exception("No data");
         } else {
-            res.peRatio = ret1[0][U("peRatioTTM")].as_double();
-            res.pegRatio = ret1[0][U("pegRatioTTM")].as_double();
-            res.debtRatio = ret1[0][U("debtRatioTTM")].as_double();
-            res.debtEquityRatio = ret1[0][U("debtEquityRatioTTM")].as_double();
-            res.priceFairValue = ret1[0][U("priceFairValueTTM")].as_double();
-            res.netProfitMargin = ret1[0][U("netProfitMarginTTM")].as_double();
-            res.piotroskiScore = ret2[0][U("piotroskiScore")].as_double();
+            res.peRatio = ret1[0][_XPLATSTR("peRatioTTM")].as_double();
+            res.pegRatio = ret1[0][_XPLATSTR("pegRatioTTM")].as_double();
+            res.debtRatio = ret1[0][_XPLATSTR("debtRatioTTM")].as_double();
+            res.debtEquityRatio = ret1[0][_XPLATSTR("debtEquityRatioTTM")].as_double();
+            res.priceFairValue = ret1[0][_XPLATSTR("priceFairValueTTM")].as_double();
+            res.netProfitMargin = ret1[0][_XPLATSTR("netProfitMarginTTM")].as_double();
+            res.piotroskiScore = ret2[0][_XPLATSTR("piotroskiScore")].as_double();
         }
 
         return res;
@@ -190,13 +190,13 @@ namespace Fundamentals
 
                 FinancialScores temp;
 
-                temp.peRatio = dataObj[U("priceEarningsRatio")].as_double();
-                temp.pegRatio = dataObj[U("priceEarningsToGrowthRatio")].as_double();
-                temp.debtRatio = dataObj[U("debtRatio")].as_double();
-                temp.debtEquityRatio = dataObj[U("debtEquityRatio")].as_double();
-                temp.priceFairValue = dataObj[U("priceFairValue")].as_double();
-                temp.netProfitMargin = dataObj[U("netProfitMargin")].as_double();
-                temp.date = dataObj[U("date")].as_string();
+                temp.peRatio = dataObj[_XPLATSTR("priceEarningsRatio")].as_double();
+                temp.pegRatio = dataObj[_XPLATSTR("priceEarningsToGrowthRatio")].as_double();
+                temp.debtRatio = dataObj[_XPLATSTR("debtRatio")].as_double();
+                temp.debtEquityRatio = dataObj[_XPLATSTR("debtEquityRatio")].as_double();
+                temp.priceFairValue = dataObj[_XPLATSTR("priceFairValue")].as_double();
+                temp.netProfitMargin = dataObj[_XPLATSTR("netProfitMargin")].as_double();
+                temp.date = dataObj[_XPLATSTR("date")].as_string();
                 temp.unixDate = TimeConversions::convertTimeToUnix(temp.date);
 
                 res.push_back(temp);
@@ -222,17 +222,17 @@ namespace Fundamentals
 
         auto tempArr1 = retVal1.as_array();
         auto tempArr2 = retVal2.as_array();
-        tempArr2 = tempArr2[0][U("peersList")].as_array();
+        tempArr2 = tempArr2[0][_XPLATSTR("peersList")].as_array();
         vector<string> peers;
 
-        res.beta = tempArr1[0][U("beta")].as_double();
-        res.volAvg = tempArr1[0][U("volAvg")].as_double();
-        res.marketCap = tempArr1[0][U("mktCap")].as_double();
-        res.cik = tempArr1[0][U("cik")].as_string();
-        res.isin = tempArr1[0][U("isin")].as_string();
-        res.exchange = tempArr1[0][U("exchange")].as_string();
-        res.industry = tempArr1[0][U("industry")].as_string();
-        res.sector = tempArr1[0][U("sector")].as_string();
+        res.beta = tempArr1[0][_XPLATSTR("beta")].as_double();
+        res.volAvg = tempArr1[0][_XPLATSTR("volAvg")].as_double();
+        res.marketCap = tempArr1[0][_XPLATSTR("mktCap")].as_double();
+        res.cik = tempArr1[0][_XPLATSTR("cik")].as_string();
+        res.isin = tempArr1[0][_XPLATSTR("isin")].as_string();
+        res.exchange = tempArr1[0][_XPLATSTR("exchange")].as_string();
+        res.industry = tempArr1[0][_XPLATSTR("industry")].as_string();
+        res.sector = tempArr1[0][_XPLATSTR("sector")].as_string();
 
         for (auto i : tempArr2) {
             peers.push_back(i.as_string());
@@ -259,14 +259,14 @@ namespace Fundamentals
                 InsiderTrade temp;
 
                 temp.symbol = ticker;
-                temp.filingDate = dataObj[U("filingDate")].as_string();
+                temp.filingDate = dataObj[_XPLATSTR("filingDate")].as_string();
                 temp.filingDateUnix = TimeConversions::convertTimeToUnix(temp.filingDate);
-                temp.transactionDate = dataObj[U("transactionDate")].as_string();
+                temp.transactionDate = dataObj[_XPLATSTR("transactionDate")].as_string();
                 temp.txnDateUnix = TimeConversions::convertTimeToUnix(temp.transactionDate);
-                temp.transactionType = dataObj[U("transactionType")].as_string();
+                temp.transactionType = dataObj[_XPLATSTR("transactionType")].as_string();
                 if (temp.transactionType == "S-Sale") temp.isSale = true;
-                temp.securitiesTransacted = dataObj[U("securitiesTransacted")].as_double();
-                temp.price = dataObj[U("price")].as_double();
+                temp.securitiesTransacted = dataObj[_XPLATSTR("securitiesTransacted")].as_double();
+                temp.price = dataObj[_XPLATSTR("price")].as_double();
                 temp.totalTransaction = temp.securitiesTransacted * temp.price;
 
                 res.push_back(temp);

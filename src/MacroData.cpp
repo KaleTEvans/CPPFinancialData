@@ -20,20 +20,20 @@ namespace MacroData
             json::value dataObj = data;
             EconomicEvent temp;
 
-            string country = dataObj[U("country")].as_string();
-            string impact = dataObj[U("impact")].as_string();
+            string country = dataObj[_XPLATSTR("country")].as_string();
+            string impact = dataObj[_XPLATSTR("impact")].as_string();
             if (country != "US" && country != "EU" || impact == "Low") continue;
 
             temp.country = country;
             temp.impact = impact;
-            temp.event = dataObj[U("event")].as_string();
-            temp.date = dataObj[U("date")].as_string();
+            temp.event = dataObj[_XPLATSTR("event")].as_string();
+            temp.date = dataObj[_XPLATSTR("date")].as_string();
             temp.unixTime = TimeConversions::convertTimeToUnix(temp.date);
-            if (!dataObj[U("actual")].is_null()) temp.actual = dataObj[U("actual")].as_double();
-            if (!dataObj[U("previous")].is_null()) temp.previous = dataObj[U("previous")].as_double();
-            if (!dataObj[U("change")].is_null()) temp.change = dataObj[U("change")].as_double();
-            if (!dataObj[U("changePercentage")].is_null()) temp.changePct = dataObj[U("changePercentage")].as_double();
-            if (!dataObj[U("estimate")].is_null()) temp.estimate = dataObj[U("estimate")].as_double();
+            if (!dataObj[_XPLATSTR("actual")].is_null()) temp.actual = dataObj[_XPLATSTR("actual")].as_double();
+            if (!dataObj[_XPLATSTR("previous")].is_null()) temp.previous = dataObj[_XPLATSTR("previous")].as_double();
+            if (!dataObj[_XPLATSTR("change")].is_null()) temp.change = dataObj[_XPLATSTR("change")].as_double();
+            if (!dataObj[_XPLATSTR("changePercentage")].is_null()) temp.changePct = dataObj[_XPLATSTR("changePercentage")].as_double();
+            if (!dataObj[_XPLATSTR("estimate")].is_null()) temp.estimate = dataObj[_XPLATSTR("estimate")].as_double();
 
             res.push_back(temp);
         }
@@ -59,18 +59,18 @@ namespace MacroData
             json::value dataObj = data;
             TreasuryRates temp;
 
-            temp.date = dataObj[U("date")].as_string();
+            temp.date = dataObj[_XPLATSTR("date")].as_string();
             temp.unixDate = TimeConversions::convertTimeToUnix(temp.date);
-            temp.oneMonth = dataObj[U("month1")].as_double();
-            temp.twoMonth = dataObj[U("month2")].as_double();
-            temp.threeMonth = dataObj[U("month3")].as_double();
-            temp.oneYear = dataObj[U("year1")].as_double();
-            temp.twoYear = dataObj[U("year2")].as_double();
-            temp.fiveYear = dataObj[U("year5")].as_double();
-            temp.sevenYear = dataObj[U("year7")].as_double();
-            temp.tenYear = dataObj[U("year10")].as_double();
-            temp.twentyYear = dataObj[U("year20")].as_double();
-            temp.thirtyYear = dataObj[U("year30")].as_double();
+            temp.oneMonth = dataObj[_XPLATSTR("month1")].as_double();
+            temp.twoMonth = dataObj[_XPLATSTR("month2")].as_double();
+            temp.threeMonth = dataObj[_XPLATSTR("month3")].as_double();
+            temp.oneYear = dataObj[_XPLATSTR("year1")].as_double();
+            temp.twoYear = dataObj[_XPLATSTR("year2")].as_double();
+            temp.fiveYear = dataObj[_XPLATSTR("year5")].as_double();
+            temp.sevenYear = dataObj[_XPLATSTR("year7")].as_double();
+            temp.tenYear = dataObj[_XPLATSTR("year10")].as_double();
+            temp.twentyYear = dataObj[_XPLATSTR("year20")].as_double();
+            temp.thirtyYear = dataObj[_XPLATSTR("year30")].as_double();
 
             res.push_back(temp);
         }
@@ -82,7 +82,7 @@ namespace MacroData
         string params = "/query?function=TREASURY_YIELD&interval=" + interval + "&maturity=" + maturity + "&";
         json::value retVal = Connect::getJson(alphaUrl, params, alphaKey);
 
-        if (retVal[U("data")].as_array().size() < 1) {
+        if (retVal[_XPLATSTR("data")].as_array().size() < 1) {
             CPPFINANCIALDATA_WARN("No data received for: ", maturity);
             throw json::json_exception("API Limit Reached");
         }
@@ -95,9 +95,9 @@ namespace MacroData
 
             EconomicIndicator temp;
             temp.attribute = maturity;
-            temp.date = dataObj[U("date")].as_string();
+            temp.date = dataObj[_XPLATSTR("date")].as_string();
             temp.unixDate = TimeConversions::convertTimeToUnix(temp.date);
-            string percent = dataObj[U("value")].as_string();
+            string percent = dataObj[_XPLATSTR("value")].as_string();
             temp.value = std::stod(percent);
 
             res.push_back(temp);

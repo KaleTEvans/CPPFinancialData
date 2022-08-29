@@ -5,9 +5,9 @@ namespace Connect
     json::value getJson(string base, string link, string end) {
         json::value retVal;
 
-        auto requestJson = http_client(U(base))
+        auto requestJson = http_client(_XPLATSTR(base))
             .request(methods::GET,
-                uri_builder(U(link + end)).to_string())
+                uri_builder(_XPLATSTR(link + end)).to_string())
         // Get the response
         .then([](http_response response) {
             // Check the status code.
