@@ -63,11 +63,28 @@ namespace PriceData
         long volume;
     };
 
+    struct HistoricalCandle {
+        string date;
+        long unixDate;
+        double open;
+        double high;
+        double low;
+        double close;
+        double adjClose;
+        long volume;
+        long unadjustedVol;
+        double change;
+        double changePct;
+        double vwap;
+    };
+
     Quote getQuote(const string ticker);
     BidAsk latestBidAsk(const string ticker); 
-    // Will just use recent candles here, historical price and technical data are not great on FMP
-    // will likely need a different source
+    // Will just use recent candles here, historical price and technical data are not great on FMP if not using daily
+    // will likely need a different source 
     vector<Candle> getHistoricalPrice(const string ticker, string interval = "4hour");
+
+    vector<HistoricalCandle> getDailyHistoricalData(const string ticker, string from, string to);
 }
 
 #endif // PRICEDATA_H

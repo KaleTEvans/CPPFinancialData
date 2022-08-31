@@ -168,4 +168,41 @@ namespace PriceData
 
         return res;
     }
+
+    vector<HistoricalCandle> getDailyHistoricalData(const string ticker, string from, string to) {
+        string params = "/historical-price-full/" + ticker + "?from=" + from + "&to=" + to + "&";
+        cout << fmpUrl + params + fmpToken << endl;
+        json::value ret = Connect::getJson(fmpUrl, params, fmpToken);
+        json::array retVal = ret[_XPLATSTR("historical")].as_array();
+
+        vector<HistoricalCandle> res;
+
+        if (retVal.size() < 1) {
+            CPPFINANCIALDATA_WARN("No data received for: {}", ticker);
+        } else {
+            auto jsonArr = retVal;
+            for (auto it = jsonArr.begin(); it != jsonArr.end(); ++it) {
+                auto data = *it;
+                json::value dataObj = data;
+                HistoricalCandle temp;
+
+                temp.date = dataObj[_XPLATSTR("date")].as_string();
+                temp.unixDate = TimeConversions::convertTimeToUnix(temp.date);
+                temp.open = dataObj[_XPLATSTR("open")].as_double();
+                temp.high = dataObj[_XPLATSTR("high")].as_double();
+                temp.low = dataObj[_XPLATSTR("low")].as_double();
+                temp.close = dataObj[_XPLATSTR("close")].as_double();
+                temp.adjClose = dataObj[_XPLATSTR("adjClose")].as_double();
+                temp.volume = dataObj[_XPLATSTR("volume")].as_double();
+                temp.unadjustedVol = dataObj[_XPLATSTR("unadjustedVolume")].as_double();
+                temp.change = dataObj[_XPLATSTR("change")].as_double();
+                temp.changePct = dataObj[_XPLATSTR("changePercent")].as_double();
+                temp.vwap = dataObj[_XPLATSTR("vwap")].as_double();
+
+                res.push_back(temp);
+            }
+        }
+
+        return res;
+    }
 }
